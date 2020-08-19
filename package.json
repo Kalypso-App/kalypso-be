@@ -1,0 +1,47 @@
+{
+  "name": "calypso-api",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "scripts": {
+    "pretest": "eslint --ignore-path .gitignore . --fix",
+    "test": "jest --config ./jest.config.json",
+    "prod": "env-cmd -f ./.env pm2 start src/app.js --watch --env production",
+    "dev": "env-cmd -f ./.env nodemon src/app.js"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@sendgrid/mail": "^7.1.0",
+    "aws-sdk": "^2.686.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "env-cmd": "^10.1.0",
+    "express": "^4.17.1",
+    "express-jwt": "^5.3.3",
+    "googleapis": "^52.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.5.7",
+    "mongoose": "^5.9.12",
+    "multer": "^1.4.2",
+    "nodemon": "^2.0.3",
+    "passport": "^0.4.1",
+    "passport-facebook": "^3.0.0",
+    "passport-facebook-token": "^3.3.0",
+    "query-string": "^6.13.1",
+    "stripe": "^8.60.0",
+    "supertest": "^4.0.2",
+    "validator": "^13.0.0",
+    "vee-validate": "^3.3.3"
+  },
+  "devDependencies": {
+    "axios": "^0.18.1",
+    "eslint": "^7.0.0",
+    "eslint-config-strongloop": "^2.1.0",
+    "eslint-plugin-jest": "^23.13.1",
+    "jest": "^26.0.1",
+    "vue-cli-plugin-axios": "0.0.4"
+  },
+  "license": "ISC"
+}
