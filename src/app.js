@@ -10,6 +10,8 @@ const gaReportRouter = require("./routers/gareport");
 const port = process.env.PORT;
 const bodyParser = require("body-parser");
 const cors = require("cors");
+var morgan = require('morgan');
+var winston = require('./config/winston');
 
 require("./db/db");
 
@@ -28,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-
+app.use(morgan('combined', { stream: winston.stream }));
 app.use(userRouter);
 app.use("/instagram", instagramRouter);
 app.use("/campaigns", campaignRouter);

@@ -10,6 +10,8 @@ const InstagramRepository = require("../models/repositories/InstagramRepository"
 const bcrypt = require("bcryptjs");
 const queryString = require("query-string");
 const axios = require("axios");
+var logger = require('../config/winston');
+
 passport.serializeUser(function (user, cb) {
   cb(null, user);
 });
@@ -372,6 +374,7 @@ router.get("/get-google-url", auth, async (req, res) => {
 router.get("/authentication/facebook", async (req, res) => {
   let code = req.query.code;
   let userId = req.query.state;
+  logger.info("user id : " + userId);
   console.log(userId);
   try {
     const { data } = await axios({
@@ -380,7 +383,7 @@ router.get("/authentication/facebook", async (req, res) => {
       params: {
         client_id: process.env.FB_APP_ID,
         client_secret: process.env.FB_APP_SECRET,
-        redirect_uri: `${process.env.BACKEND_API}/authentication/facebook/`,
+        redirect_uri: `${process.env.BACKEND_API}/authentication/facebook`,
         code,
       },
     });
