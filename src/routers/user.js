@@ -297,6 +297,9 @@ let sendToken = function (req, res) {
 };
 
 router.get("/get-user", auth, async (req, res) => {
+  logger.info("get-user");
+  logger.info("auth " + auth.user._id);
+  
   return res.send(auth.user._id);
 });
 
