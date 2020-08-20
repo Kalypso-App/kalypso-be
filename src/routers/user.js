@@ -297,7 +297,7 @@ let sendToken = function (req, res) {
 };
 
 router.get("/get-user", auth, async (req, res) => {
-  return res.send(req.user);
+  return res.send(auth.user._id);
 });
 
 router.get("/get-facebook-url", auth, async (req, res) => {
