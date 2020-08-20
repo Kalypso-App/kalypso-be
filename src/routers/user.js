@@ -370,7 +370,6 @@ router.get("/get-google-url", auth, async (req, res) => {
   res.send(`${process.env.BACKEND_API}/auth/googleauth/${req.user._id}`);
 });
 
-
 router.get("/authentication/facebook", async (req, res) => {
   let code = req.query.code;
   let userId = req.query.state;
