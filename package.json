@@ -7,7 +7,8 @@
     "pretest": "eslint --ignore-path .gitignore . --fix",
     "test": "jest --config ./jest.config.json",
     "prod": "env-cmd -f ./.env pm2 start src/app.js --watch --env production",
-    "dev": "env-cmd -f ./.env nodemon src/app.js"
+    "dev": "env-cmd -f ./.env nodemon src/app.js",
+    "production": "env-cmd -f ./envprod pm2 start src/app.js --watch --env production"
   },
   "main": "index.js",
   "dependencies": {
