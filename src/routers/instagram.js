@@ -3,12 +3,14 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const InstagramGraphApiController = require("../controllers/InstagramGraphApiController");
 const InstagramCtrl = new InstagramGraphApiController();
+var logger = require('../config/winston');
 
 router.get("/accounts", auth, InstagramCtrl.getAccounts);
 router.get("/posts", auth, InstagramCtrl.getPosts);
 router.get("/stories", auth, InstagramCtrl.getStories);
 router.get("/webhooks",  async (req, res) => {
      // Your verify token. Should be a random string.
+     logger.info("inside webhook")
   let VERIFY_TOKEN = "WinterIsComingGOT2019";
   logger.info(req.query["hub.verify_token"]);
   // Parse the query params
