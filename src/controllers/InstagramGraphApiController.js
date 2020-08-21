@@ -113,7 +113,7 @@ class InstagramGraphApiController {
   async getwebhook(req,res){
     // Your verify token. Should be a random string.
   let VERIFY_TOKEN = "WinterIsComingGOT2019";
-  logger.info(req.query["hub.verify_token"]);
+  //logger.info(req.query["hub.verify_token"]);
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];

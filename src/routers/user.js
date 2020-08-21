@@ -370,7 +370,6 @@ router.get("/authentication/instagram", async (req, res) => {
 });
 
 router.get("/get-google-url", auth, async (req, res) => {
-  logger.info("getgoogleurl : " + req.user._id);
   res.send(`${process.env.BACKEND_API}/auth/googleauth/${req.user._id}`);
 });
 
@@ -443,11 +442,9 @@ router.get("/authentication/facebook", async (req, res) => {
       }
       return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
     } catch (e) {
-      logger.error("error " + JSON.stringify(e));
       return res.status(403).json({ error: e.message });
     }
   } catch (e) {
-    logger.error("error " + JSON.stringify(e));
     return res.status(403).json({ error: e.message });
   }
 

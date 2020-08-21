@@ -52,7 +52,7 @@ app.use(bodyParser.json({
 
 //app.use(bodyParser.raw());
 //app.use(express.json());
-app.use(morgan('combined', { stream: winston.stream }));
+//app.use(morgan('combined', { stream: winston.stream }));
 app.use(userRouter);
 app.use("/instagram", instagramRouter);
 app.use("/campaigns", campaignRouter);

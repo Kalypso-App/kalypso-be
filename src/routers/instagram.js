@@ -10,9 +10,7 @@ router.get("/posts", auth, InstagramCtrl.getPosts);
 router.get("/stories", auth, InstagramCtrl.getStories);
 router.get("/webhooks",  async (req, res) => {
      // Your verify token. Should be a random string.
-     logger.info("inside webhook")
   let VERIFY_TOKEN = "WinterIsComingGOT2019";
-  logger.info(req.query["hub.verify_token"]);
   // Parse the query params
   let mode = req.query['hub.mode'];
   let token = req.query['hub.verify_token'];
