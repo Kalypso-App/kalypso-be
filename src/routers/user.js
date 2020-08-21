@@ -380,9 +380,9 @@ router.get("/authentication/facebook", async (req, res) => {
   let code = req.query.code;
   let userId = req.query.state;
   //logger.info("Looger code: " + req.query.code);
-  logger.info("Looger state : " + req.query.state);
+  //logger.info("logger state : " + userId);
   
-  userId = userId.replace("#_=_","");
+  //userId = userId.replace("#_=_","");
 
   logger.info("user id : " + userId);
   try {
