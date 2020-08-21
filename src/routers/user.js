@@ -392,7 +392,7 @@ router.get("/authentication/facebook", async (req, res) => {
         code,
       },
     });
-    logger.info("data ");
+    //logger.info("data ");
    
     try {
       // finding the user based on id and updating the token for that user
