@@ -90,7 +90,7 @@ class CampaignController {
         }
         catch(ex){
             insightsForAllCampaignPosts.stories.push({
-              stories: campaignPosts[i],
+              stories: campaignStories[i],
               insights:[],
               error: ex.message
             });
