@@ -308,7 +308,7 @@ router.get("/get-user", auth, async (req, res) => {
 router.get("/get-facebook-url", auth, async (req, res) => {
   const stringifiedParams = queryString.stringify({
     client_id: process.env.FB_APP_ID,
-    redirect_uri: `${process.env.BACKEND_API}/authentication/facebook/`,
+    redirect_uri: `${process.env.BACKEND_API}/authentication/facebook`,
     state: req.user._id,
     scope:
       "email,public_profile, instagram_basic, instagram_manage_insights, pages_show_list", // comma seperated string
