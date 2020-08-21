@@ -25,6 +25,7 @@ passport.use(
       clientID: process.env.FB_APP_ID,
       clientSecret: process.env.FB_APP_SECRET,
       callbackURL: `${process.env.BACKEND_API}/return`,
+      profileFields: ['id', 'displayName', 'photos', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -46,6 +47,7 @@ passport.use(
           if (user) {
             console.log("user found!");
             user.fb_access_token = refreshToken;
+            user.image = profile.photos[0] ? profile.photos[0].value : "",
             await user.save();
             return done(null, user);
           } else {
@@ -54,7 +56,7 @@ passport.use(
               confirmed: new Date(),
               email: profile.emails[0].value,
               name: profile.displayName,
-              image: profile.photos[0] ? profile.photos[0].image : "",
+              image: profile.photos[0] ? profile.photos[0].value : "",
               fb_access_token: { access_token: accessToken },
               facebook_id: profile.id, //pass in the id and displayName params from Facebook
             };
@@ -298,9 +300,9 @@ let sendToken = function (req, res) {
 
 router.get("/get-user", auth, async (req, res) => {
   logger.info("get-user");
-  logger.info("auth " + auth.user._id);
+  logger.info("auth " + req.user._id);
   
-  return res.send(auth.user._id);
+  return res.send(req.user._id);
 });
 
 router.get("/get-facebook-url", auth, async (req, res) => {
@@ -385,7 +387,7 @@ router.get("/authentication/facebook", async (req, res) => {
       params: {
         client_id: process.env.FB_APP_ID,
         client_secret: process.env.FB_APP_SECRET,
-        redirect_uri: `${process.env.BACKEND_API}/authentication/facebook`,
+        redirect_uri: `${process.env.BACKEND_API}/authentication/facebook/`,
         code,
       },
     });
