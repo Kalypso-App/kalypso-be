@@ -381,10 +381,6 @@ router.get("/authentication/facebook", async (req, res) => {
   let userId = req.query.state;
   //logger.info("Looger code: " + req.query.code);
   //logger.info("logger state : " + userId);
-  
-  //userId = userId.replace("#_=_","");
-
-  logger.info("user id : " + userId);
   try {
     const { data } = await axios({
       url: "https://graph.facebook.com/v6.0/oauth/access_token",
@@ -397,8 +393,7 @@ router.get("/authentication/facebook", async (req, res) => {
       },
     });
     logger.info("data ");
-    console.log(data); // { access_token, token_type, expires_in }
-
+   
     try {
       // finding the user based on id and updating the token for that user
 
