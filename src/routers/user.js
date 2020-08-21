@@ -299,10 +299,8 @@ let sendToken = function (req, res) {
 };
 
 router.get("/get-user", auth, async (req, res) => {
-  logger.info("get-user");
-  logger.info("auth " + req.user._id);
   
-  return res.send(req.user._id);
+  return res.send(req.user);
 });
 
 router.get("/get-facebook-url", auth, async (req, res) => {
