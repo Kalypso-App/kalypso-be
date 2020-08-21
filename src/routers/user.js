@@ -366,7 +366,7 @@ router.get("/authentication/instagram", async (req, res) => {
         chosen_instagram_account: data.user_id,
       }
     );
-    return res.redirect(`${process.env.APP_FRONTEND_URL}/#/accounts`);
+    return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
   
 
 });
@@ -435,15 +435,15 @@ router.get("/authentication/facebook", async (req, res) => {
             chosen_instagram_account: instagramAccountId,
           }
         );
-        return res.redirect(`${process.env.APP_FRONTEND_URL}/#/accounts`);
+        return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
       } catch (error) {
         return res.status(403).json({ error: error.message });
       }
       if (!user) {
         // if no user found with id then return the response
-        return res.redirect(`${process.env.APP_FRONTEND_URL}/#/error`);
+        return res.redirect(`${process.env.APP_FRONTEND_URL}#/error`);
       }
-      return res.redirect(`${process.env.APP_FRONTEND_URL}/#/accounts`);
+      return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
     } catch (e) {
       logger.error("error " + JSON.stringify(e));
       return res.status(403).json({ error: e.message });
