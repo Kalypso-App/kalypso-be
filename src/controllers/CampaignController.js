@@ -43,7 +43,7 @@ class CampaignController {
       let insightsForAllCampaignPosts = {
         campaign: campaign,
         posts: [],
-        stories: [],
+        stories: []
       };
       let response;
 
@@ -82,14 +82,14 @@ class CampaignController {
           );
 
           if (response.data) {
-            insightsForAllCampaignPosts.posts.push({
+            insightsForAllCampaignPosts.stories.push({
               stories: campaignStories[i],
               insights: formatInsightResponse(response.data.data),
             });
           }
         }
         catch(ex){
-            insightsForAllCampaignPosts.posts.push({
+            insightsForAllCampaignPosts.stories.push({
               stories: campaignPosts[i],
               insights:[],
               error: ex.message
