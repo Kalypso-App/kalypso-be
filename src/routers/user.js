@@ -372,14 +372,15 @@ router.get("/authentication/instagram", async (req, res) => {
 });
 
 router.get("/get-google-url", auth, async (req, res) => {
+  logger.info("getgoogleurl : " + req.user._id);
   res.send(`${process.env.BACKEND_API}/auth/googleauth/${req.user._id}`);
 });
 
 router.get("/authentication/facebook", async (req, res) => {
   let code = req.query.code;
   let userId = req.query.state;
+  userId = userId.replace("#_=_","");
   logger.info("user id : " + userId);
-  console.log(userId);
   try {
     const { data } = await axios({
       url: "https://graph.facebook.com/v6.0/oauth/access_token",
@@ -391,7 +392,7 @@ router.get("/authentication/facebook", async (req, res) => {
         code,
       },
     });
-
+    logger.info("data ");
     console.log(data); // { access_token, token_type, expires_in }
 
     try {
@@ -445,9 +446,11 @@ router.get("/authentication/facebook", async (req, res) => {
       }
       return res.redirect(`${process.env.APP_FRONTEND_URL}/#/accounts`);
     } catch (e) {
+      logger.error("error " + JSON.stringify(e));
       return res.status(403).json({ error: e.message });
     }
   } catch (e) {
+    logger.error("error " + JSON.stringify(e));
     return res.status(403).json({ error: e.message });
   }
 
