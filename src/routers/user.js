@@ -388,7 +388,7 @@ router.get("/authentication/facebook", async (req, res) => {
       params: {
         client_id: process.env.FB_APP_ID,
         client_secret: process.env.FB_APP_SECRET,
-        redirect_uri: `${process.env.BACKEND_API}/authentication/facebook/`,
+        redirect_uri: `${process.env.BACKEND_API}/authentication/facebook`,
         code,
       },
     });
