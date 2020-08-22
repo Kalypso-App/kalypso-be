@@ -13,6 +13,8 @@ module.exports = {
     We’re so excited for you to start reporting on your brand deals with Kalypso.
     Please verify your email by clicking ${process.env.BACKEND_API}/verify-email/${id}.
     `;
+
+    logger.info(process.env.SENDGRID_API_KEY);
 	const msg = {
         to: to,
         from: 'social@kalypsoapp.co',
