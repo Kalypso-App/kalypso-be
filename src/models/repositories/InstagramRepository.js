@@ -91,7 +91,7 @@ class InstagramRepository {
     let url = generateInstagramGraphApiUrl(
       accessToken,
       "me/accounts",
-      "fields=instagram_business_account"
+      "fields=picture,name,instagram_business_account"
     );
     console.log(url);
     return new Promise(function (resolve, reject) {

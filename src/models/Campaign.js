@@ -23,6 +23,10 @@ const campaignSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  modified_date: {
+    type: Date,
+    required: false,
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

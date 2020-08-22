@@ -1,21 +1,30 @@
 const sgMail = require("@sendgrid/mail");
 
 module.exports = {
-  sendVerificationEmail: (to, id) => { // function for sending mail for email verification after register
+  sendVerificationEmail: (to, id, name) => { // function for sending mail for email verification after register
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    let html = `<p>Welcome ${name}!</p>
+    <p>We’re so excited for you to start reporting on your brand deals with Kalypso.</p>
+    <p>Please verify your email by clicking <a href="${process.env.BACKEND_API}/verify-email/${id}" target="_blank">here</a> .</p>
+    `;
+
+    let text = `Welcome ${name}!.
+    We’re so excited for you to start reporting on your brand deals with Kalypso.
+    Please verify your email by clicking ${process.env.BACKEND_API}/verify-email/${id}.
+    `;
 	const msg = {
         to: to,
-        from: 'piterjov@gmail.com',
+        from: 'social@kalypsoapp.co',
         subject: 'Verify Your Email - Kalypso',
-        text: 'Hey Katherine, please define generic text message for sign up confirmation',
-        html: `<p>Your registration is completed. Please click the below link to verify your email.</p><p><a href="${process.env.BACKEND_API}/verify-email/${id}" target="_blank">Verify Your Email</a></p>`
-    };
+        text: text,
+        html: html
+       };
 
     try {
       sgMail
         .send(msg)
-        .then(() => {})
-        .catch(() => {});
+        .then((re) => {})
+        .catch((e) => {});
     } catch (error) {
       throw new Error(error);
     }
@@ -24,16 +33,19 @@ module.exports = {
   sendForgotPasswordEmail: (to, str) => {
     // function for sending mail for forgot password
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    let text = `Hey there - we see you forgot your password for Kalypso. Don’t worry, we do this all the time, too.
+    Please reset your password at this ${process.env.BACKEND_API}/forget/${str} link`;
+
+    let html = `<p>Hey there - we see you forgot your password for Kalypso. Don’t worry, we do this all the time, too.</p>
+    <p>Please reset your password at this <a href="${process.env.BACKEND_API}/forget/${str}" target="_blank">link</a></p>`;
+
+
     const msg = {
       to: to,
-      from: "piterjov@gmail.com",
+      from: "social@kalypsoapp.co",
       subject: "Forgot Password - Kalypso",
-      text:
-        "Hey Katherine, please define generic text message for sign up confirmation",
-      html:
-        '<p>We received the request to reset your password. Please follow this link to create a new password for Kalypso</p><p><a href="https://app.kalypsoapp.co/#/forget/' +
-        str +
-        '" target="_blank">Reset Your Password</a></p>',
+      text: text,
+      html: html
     };
 
     try {

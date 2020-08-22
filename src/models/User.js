@@ -78,6 +78,10 @@ const userSchema = mongoose.Schema({
       ref: "Campaign",
     },
   ],
+  ig_detail: {
+    required: false,
+    type: Object
+  }
 });
 
 userSchema.pre("save", async function (next) {

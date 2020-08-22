@@ -8,6 +8,7 @@ class CampaignController {
   async create(req, res) {
     let campaign = req.body;
     campaign.owner = req.user._id;
+    campaign.modified_date = new Date();
     try {
       let newCampaign = await campaignRepository.create(campaign);
       req.user.campaigns.push(newCampaign._id);
@@ -23,7 +24,7 @@ class CampaignController {
   async list(req, res) {
     try {
       let campaignIds = req.user.campaigns;
-      let campaigns = await Campaign.find({ _id: campaignIds });
+      let campaigns = await Campaign.find({ _id: campaignIds }).sort({modified_date: -1});
       res.json(campaigns);
     } catch (error) {
       res.status(500).json({

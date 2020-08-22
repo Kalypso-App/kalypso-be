@@ -118,7 +118,7 @@ router.post("/register", async (req, res) => {
     user = new User(req.body);
     await user.save();
     const token = await user.generateAuthToken();
-    verification.sendVerificationEmail(user.email, user._id);
+    verification.sendVerificationEmail(user.email, user._id, user.name);
     res.status(201).send({ user });
   } catch (error) {
     res.status(400).send({ message: error._message });
@@ -397,6 +397,7 @@ router.get("/authentication/facebook", async (req, res) => {
       // SAVE INSTAGRAM ID
       let accessToken = data.access_token;
       let instagramAccountId = "";
+      let businessAcc = {};
       try {
         let facebookResponse = await InstagramRepository.getAccounts(
           accessToken
@@ -414,9 +415,10 @@ router.get("/authentication/facebook", async (req, res) => {
           if (
             instagramResponse.length > 0
           ) {
-            let businessAcc = instagramResponse.find(x=>x.instagram_business_account);
-            if(businessAcc){
-              instagramAccountId = businessAcc.instagram_business_account.id;
+            let businessAccount = instagramResponse.find(x=>x.instagram_business_account);
+            if(businessAccount){
+              instagramAccountId = businessAccount.instagram_business_account.id;
+              businessAcc = businessAccount;
             }
           } else if (instagramResponse.instagram_business_account) {
             instagramAccountId =
@@ -430,6 +432,7 @@ router.get("/authentication/facebook", async (req, res) => {
           {
             fb_access_token: data,
             chosen_instagram_account: instagramAccountId,
+            ig_detail: businessAcc
           }
         );
         return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
