@@ -1,4 +1,5 @@
 const sgMail = require("@sendgrid/mail");
+var logger = require('../config/winston');
 
 module.exports = {
   sendVerificationEmail: (to, id, name) => { // function for sending mail for email verification after register
@@ -23,9 +24,14 @@ module.exports = {
     try {
       sgMail
         .send(msg)
-        .then((re) => {})
-        .catch((e) => {});
+        .then((re) => {
+          logger.info("succes")
+        })
+        .catch((e) => {
+          logger.error("error " + e);
+        });
     } catch (error) {
+      logger.error(error);
       throw new Error(error);
     }
   },
