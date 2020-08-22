@@ -1,5 +1,4 @@
 const sgMail = require("@sendgrid/mail");
-var logger = require('../config/winston');
 
 module.exports = {
   sendVerificationEmail: (to, id, name) => { // function for sending mail for email verification after register
@@ -14,8 +13,7 @@ module.exports = {
     Please verify your email by clicking ${process.env.BACKEND_API}/verify-email/${id}.
     `;
 
-    logger.info(process.env.SENDGRID_API_KEY);
-	const msg = {
+ 	const msg = {
         to: to,
         from: 'social@kalypsoapp.co',
         subject: 'Verify Your Email - Kalypso',
@@ -27,10 +25,8 @@ module.exports = {
       sgMail
         .send(msg)
         .then((re) => {
-          logger.info("succes")
         })
         .catch((e) => {
-          logger.error("error " + e);
         });
     } catch (error) {
       logger.error(error);
