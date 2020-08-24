@@ -7,7 +7,6 @@ router.get("/secret", async (req, res) => {
   // Token is created using Stripe Checkout or Elements!
   // Get the payment token ID submitted by the form:
   const token = req.body.stripeToken; // Using Express
-
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 20 * 100,

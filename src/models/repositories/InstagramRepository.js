@@ -10,7 +10,7 @@ class InstagramRepository {
     let url = generateInstagramGraphApiUrl(
       accessToken,
       "me/accounts",
-      "fields=about,description,picture,name"
+      "fields=about,description,picture,name,access_token"
     );
     return new Promise(function (resolve, reject) {
       axios
@@ -91,7 +91,7 @@ class InstagramRepository {
     let url = generateInstagramGraphApiUrl(
       accessToken,
       "me/accounts",
-      "fields=picture,name,instagram_business_account"
+      "fields=picture,name,instagram_business_account,access_token"
     );
     console.log(url);
     return new Promise(function (resolve, reject) {
