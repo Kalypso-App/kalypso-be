@@ -9,13 +9,17 @@ class InstagramGraphApiController {
   constructor() {}
 
   async getAccounts(req, res) {
+    if(req.user.fb_access_token){
     let accessToken = req.user.fb_access_token.access_token;
-
-    try {
-      let response = await InstagramRepository.getAccounts(accessToken);
-      res.send(response.data);
-    } catch (error) {
-      res.status(403).send(error.message);
+      try {
+        let response = await InstagramRepository.getAccounts(accessToken);
+        res.send(response.data);
+      }   catch (error) {
+        res.status(403).send(error.message);
+      }
+    }
+    else{
+      res.status(200).send([]);
     }
   }
   async setAccount(req, res) {
