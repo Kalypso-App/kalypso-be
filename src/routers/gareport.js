@@ -16,22 +16,21 @@ const oAuth2Client = new google.auth.OAuth2(
   CLIENT_SECRET,
   REDIRECT_URL
 );
-let authed = false;
 
 //---------------- 1st endoint for authenticating the user starts -----------------------------//
 router.get("/auth/googleauth/:userid", async (req, res) => {
   console.log(req.params.userid);
-  if (!authed) {
+  //if (!authed) {
     // Generate an OAuth URL and redirect there
     const url = await oAuth2Client.generateAuthUrl({
       access_type: "offline",
       scope:
-        "https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/youtube.readonly",
       state: req.params.userid, // passing user id as a state to redirect url
       prompt: "consent",
     });
     res.redirect(url);
-  }
+  //}
 });
 //---------------- 1st endoint for authenticating the user ends -----------------------------//
 
@@ -39,6 +38,8 @@ router.get("/auth/googleauth/:userid", async (req, res) => {
 router.get("/auth/google/callback", function (req, res) {
   const code = req.query.code;
   const state = req.query.state; // getting the state (user id) from the url
+  var OAuth2 = google.auth.OAuth2;
+
   if (code) {
     // Get an access token based on our OAuth code
     oAuth2Client.getToken(code, async (err, tokens) => {
@@ -48,11 +49,25 @@ router.get("/auth/google/callback", function (req, res) {
       } else {
         console.log("Successfully authenticated");
         oAuth2Client.setCredentials(tokens);
-        authed = true;
+        let google_profile = {};
+        var oauth2 = google.oauth2({
+          auth: oAuth2Client,
+          version: 'v2'
+        });
+        let profile = await oauth2.userinfo.v2.me.get();
+        if(profile && profile.data){
+          google_profile = profile.data;
+        }
+
+        //authed = true;
         console.log("STATE IS ", state);
         const user = await User.updateOne(
           { _id: state },
-          { google_tokens: tokens, new: true }
+          { 
+            google_tokens: tokens, 
+            new: true,
+            google_detail: google_profile
+          }
         ); // finding the user based on id and updating the token for that user
         if (!user) {
           // if no user found with id then return the response

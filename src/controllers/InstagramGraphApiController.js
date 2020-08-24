@@ -137,12 +137,7 @@ class InstagramGraphApiController {
  }
 
   async webhook(req, res) {
-    //logger.info("1");
-    //logger.info("2");
-    //logger.info("3");
-    
-    //logger.info(req.query["hub.verify_token"]);
-    if (true || req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
+    if (req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
       let storyInsight = new StoryInsights(req.body);
       storyInsight.save();
       res.status(200).send(req.query["hub.challenge"]);
