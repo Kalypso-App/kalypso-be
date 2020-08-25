@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const InstagramRepository = require("../models/repositories/InstagramRepository");
 const StoryInsights = require("../models/StoryInsights");
 var logger = require('../config/winston');
+const Campaign = require("../models/Campaign");
 
 class InstagramGraphApiController {
   constructor() {}
@@ -142,8 +143,33 @@ class InstagramGraphApiController {
 
   async webhook(req, res) {
     if (req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
-      let storyInsight = new StoryInsights(req.body);
-      storyInsight.save();
+
+      var dayAgo = 24 * 60 * 60 * 1000; /* ms */
+      dayAgo = new Date(new Date().getTime() - dayAgo);
+
+      let campaigns = await Campaign.find({
+        modified_date: { $gte: dayAgo  }
+      });
+ 
+      // Loop all campaigns modified within last 24 hrs.
+      campaigns.forEach((campaign)=>{
+        // Check campaign has IG Story
+        if(campaign.stories && campaign.stories.length){
+          campaign.stories.forEach((story)=>{
+            // Check webhook has story.
+            if(req.body && req.body.entry.length){
+              req.body.entry.forEach(entry=>{
+                let findStory = entry.changes.find(x=>x.value && x.value.media_id == story.id);
+                if(findStory){
+                  let storyInsight = new StoryInsights(findStory.value);
+                  storyInsight.save();            
+                }
+              })
+            }
+          });
+        }
+      });
+
       res.status(200).send(req.query["hub.challenge"]);
     } else {
       res.status(401).send("that is not cool");
