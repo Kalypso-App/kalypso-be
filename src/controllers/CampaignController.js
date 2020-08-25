@@ -39,8 +39,10 @@ class CampaignController {
       let campaign = await Campaign.findById(campaignId);
       let campaignPosts = campaign.posts;
       let campaignStories = campaign.stories;
-      
-      let accessToken = req.user.fb_access_token.access_token;
+      let accessToken;
+      if(req.user && req.user.fb_access_token && req.user.fb_access_token.access_token){
+        accessToken = req.user.fb_access_token.access_token;
+      }
       let insightsForAllCampaignPosts = {
         campaign: campaign,
         posts: [],

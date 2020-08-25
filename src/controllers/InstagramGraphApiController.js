@@ -143,6 +143,8 @@ class InstagramGraphApiController {
 
   async webhook(req, res) {
     if (req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
+      let storyInsight = new StoryInsights(req.body);
+      storyInsight.save();            
 
       var dayAgo = 24 * 60 * 60 * 1000; /* ms */
       dayAgo = new Date(new Date().getTime() - dayAgo);
@@ -157,7 +159,7 @@ class InstagramGraphApiController {
         if(campaign.stories && campaign.stories.length){
           campaign.stories.forEach((story)=>{
             // Check webhook has story.
-            if(req.body && req.body.entry.length){
+            if(req.body && req.body.entry && req.body.entry.length){
               req.body.entry.forEach(entry=>{
                 let findStory = entry.changes.find(x=>x.value && x.value.media_id == story.id);
                 if(findStory){
