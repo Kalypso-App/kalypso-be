@@ -18,15 +18,15 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 
 //---------------- 1st endoint for authenticating the user starts -----------------------------//
-router.get("/auth/googleauth/:userid", async (req, res) => {
+router.get("/auth/googleauth/ga/:userid", async (req, res) => {
   console.log(req.params.userid);
   //if (!authed) {
     // Generate an OAuth URL and redirect there
     const url = await oAuth2Client.generateAuthUrl({
       access_type: "offline",
       scope:
-        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/youtube.readonly",
-      state: req.params.userid, // passing user id as a state to redirect url
+        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/analytics.readonly",
+      state: req.params.userid + "|" + "ga", // passing user id as a state to redirect url
       prompt: "consent",
     });
     res.redirect(url);
@@ -34,10 +34,30 @@ router.get("/auth/googleauth/:userid", async (req, res) => {
 });
 //---------------- 1st endoint for authenticating the user ends -----------------------------//
 
+//---------------- 1st endoint for authenticating the user starts -----------------------------//
+router.get("/auth/googleauth/yt/:userid", async (req, res) => {
+  console.log(req.params.userid);
+  //if (!authed) {
+    // Generate an OAuth URL and redirect there
+    const url = await oAuth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope:
+        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/youtube.readonly",
+      state: req.params.userid + "|" + "yt", // passing user id as a state to redirect url
+      prompt: "consent",
+    });
+    res.redirect(url);
+  //}
+});
+//---------------- 1st endoint for authenticating the user ends -----------------------------//
+
+
 //---------------- endoint for callback url for authenticating the user starts -----------------------------//
 router.get("/auth/google/callback", function (req, res) {
   const code = req.query.code;
-  const state = req.query.state; // getting the state (user id) from the url
+  const staterecieved = req.query.state; // getting the state (user id) from the url
+  const state = staterecieved.split("|")[0];
+  const mode = staterecieved.split("|")[1];
   var OAuth2 = google.auth.OAuth2;
 
   if (code) {
@@ -61,14 +81,29 @@ router.get("/auth/google/callback", function (req, res) {
 
         //authed = true;
         console.log("STATE IS ", state);
-        const user = await User.updateOne(
-          { _id: state },
-          { 
-            google_tokens: tokens, 
-            new: true,
-            google_detail: google_profile
-          }
-        ); // finding the user based on id and updating the token for that user
+        let user;
+        // For youtube
+        if(mode == "yt"){
+            user = await User.updateOne(
+            { _id: state },
+            { 
+              google_tokens: tokens, 
+              new: true,
+              google_detail: google_profile
+            }
+          );
+        }
+        else{
+          user = await User.updateOne(
+            { _id: state },
+            { 
+              google_ga_tokens: tokens, 
+              new: true,
+              google_detail: google_profile
+            }
+          );
+        }
+        // finding the user based on id and updating the token for that user
         if (!user) {
           // if no user found with id then return the response
           return res.status(403).send({ error: "No user found." });
@@ -87,7 +122,7 @@ router.get("/auth/get-views/:userid", async (req, res) => {
     // if no user found with id then return the response
     return res.status(403).send({ error: "No user found." });
   }
-  oAuth2Client.setCredentials(user.google_tokens[0]); // setting the crdentials for old tokens to oAuth
+  oAuth2Client.setCredentials(user.google_ga_tokens[0]); // setting the crdentials for old tokens to oAuth
   oAuth2Client.refreshAccessToken((err, tokens) => {
     // generating the new access token based on the previous generated refresh token
     if (err) {
@@ -121,7 +156,7 @@ router.get("/auth/gareport/:userid/:viewid", async (req, res) => {
     // if no user found with id then return the response
     return res.status(403).send({ error: "No user found." });
   }
-  oAuth2Client.setCredentials(user.google_tokens[0]); // setting the crdentials for old tokens to oAuth
+  oAuth2Client.setCredentials(user.google_ga_tokens[0]); // setting the crdentials for old tokens to oAuth
   oAuth2Client.refreshAccessToken((err, tokens) => {
     // generating the new access token based on the previous generated
     if (err) {

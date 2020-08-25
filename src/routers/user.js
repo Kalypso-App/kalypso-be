@@ -369,8 +369,12 @@ router.get("/authentication/instagram", async (req, res) => {
 
 });
 
-router.get("/get-google-url", auth, async (req, res) => {
-  res.send(`${process.env.BACKEND_API}/auth/googleauth/${req.user._id}`);
+router.get("/get-google-ga-url", auth, async (req, res) => {
+  res.send(`${process.env.BACKEND_API}/auth/googleauth/ga/${req.user._id}`);
+});
+
+router.get("/get-google-yt-url", auth, async (req, res) => {
+  res.send(`${process.env.BACKEND_API}/auth/googleauth/yt/${req.user._id}`);
 });
 
 router.get("/authentication/facebook", async (req, res) => {
