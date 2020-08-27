@@ -9,9 +9,17 @@ let AWS = require("aws-sdk");
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
 
-router.post("/", auth, CampaignCtrl.create);
+router.post("/", auth, function(req,res){
+   CampaignCtrl.create(req,res);
+});
 router.get("/", auth, CampaignCtrl.list);
 router.get("/:id", auth, CampaignCtrl.get);
+router.get("/sync/:id", auth, function(req,res){
+  CampaignCtrl.sync(req, res);
+});
+router.get("/search/:text", auth, function(req,res){
+  CampaignCtrl.search(req,res);
+});
 
 router.post("/upload", auth, upload.single("file"), (req, res) => {
   const file = req.file;
