@@ -143,9 +143,7 @@ class InstagramGraphApiController {
 
   async webhook(req, res) {
     if (true || req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
-      let storyInsight = new StoryInsights(req.body);
-      storyInsight.save();            
-
+     
       var dayAgo = 24 * 60 * 60 * 1000; /* ms */
       dayAgo = new Date(new Date().getTime() - dayAgo);
 
