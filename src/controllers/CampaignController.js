@@ -41,9 +41,7 @@ class CampaignController {
         }
       }
       if(campaign.stories && campaign.stories.length){
-        for(var story of campaign.stories){
-          story.insights = [];
-        }
+      
       }
       if(campaign.yt_videos && campaign.yt_videos.length){
         for(var youtube of campaign.yt_videos){
@@ -80,7 +78,6 @@ class CampaignController {
       { _id: campaignId },
       {
         posts: campaign.posts,
-        stories: campaign.stories,
         yt_videos: campaign.yt_videos,
         blog_pages: campaign.blog_pages
       }

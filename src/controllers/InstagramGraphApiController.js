@@ -144,7 +144,7 @@ class InstagramGraphApiController {
   async webhook(req, res) {
     if (true || req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
      
-      var dayAgo = 24 * 60 * 60 * 1000; /* ms */
+      var dayAgo = 72 * 60 * 60 * 1000; /* ms */
       dayAgo = new Date(new Date().getTime() - dayAgo);
 
       let campaigns = await Campaign.find({
@@ -152,7 +152,9 @@ class InstagramGraphApiController {
       });
  
       // Loop all campaigns modified within last 24 hrs.
-      campaigns.forEach((campaign)=>{
+      campaigns.forEach((campaignDB)=>{
+        let campaign =  campaignDB.toObject();
+        let needUpdate = false;
         // Check campaign has IG Story
         if(campaign.stories && campaign.stories.length){
           campaign.stories.forEach((story)=>{
@@ -162,11 +164,25 @@ class InstagramGraphApiController {
                 let findStory = entry.changes.find(x=>x.value && x.value.media_id == story.id);
                 if(findStory){
                   let storyInsight = new StoryInsights(findStory.value);
-                  storyInsight.save();            
+                  storyInsight.save();
+                  delete findStory.value.media_id;
+                  story.insights = findStory.value;   
+                  needUpdate = true;               
                 }
               })
             }
           });
+          if(needUpdate){
+            let campaignId = campaignDB.get('id');
+            Campaign.updateOne(
+              { _id: campaignId },
+              {
+                stories: campaign.stories
+              }
+            ).catch(err=>{
+
+            })
+          }
         }
       });
 
