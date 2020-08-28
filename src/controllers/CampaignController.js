@@ -142,68 +142,6 @@ class CampaignController {
       let insightsForAllCampaignPosts = {
         campaign: campaign
       };
-      /*
-      if(req.user && req.user.fb_access_token && req.user.fb_access_token.access_token){
-        accessToken = req.user.fb_access_token.access_token;
-      }
-      let insightsForAllCampaignPosts = {
-        campaign: campaign,
-        posts: [],
-        stories: []
-      };
-      let response;
-
-      if (campaign && campaignPosts && campaignPosts.length) {
-        for (let i = 0; i < campaignPosts.length; i++) {
-           try{
-          response = await InstagramRepository.getInsights(
-            accessToken,
-            campaignPosts[i].id
-          );
-
-          if (response.data) {
-            insightsForAllCampaignPosts.posts.push({
-              post: campaignPosts[i],
-              insights: formatInsightResponse(response.data.data),
-            });
-          }
-        }
-        catch(ex){
-          insightsForAllCampaignPosts.posts.push({
-            post: campaignPosts[i],
-            insights:[],
-            error: ex.message
-          });
-        }
-        }
-      }
-
-      if (campaign && campaignStories && campaignStories.length) {
-        for (let i = 0; i < campaignStories.length; i++) {
-          try{
-          response = await InstagramRepository.getInsights(
-            accessToken,
-            campaignStories[i].id,
-            false
-          );
-
-          if (response.data) {
-            insightsForAllCampaignPosts.stories.push({
-              stories: campaignStories[i],
-              insights: formatInsightResponse(response.data.data),
-            });
-          }
-        }
-        catch(ex){
-            insightsForAllCampaignPosts.stories.push({
-              stories: campaignStories[i],
-              insights:[],
-              error: ex.message
-            });
-        }
-        }
-      }
-      */
       res.status(201).json(insightsForAllCampaignPosts);
     } catch (error) {
       res.status(403).json({

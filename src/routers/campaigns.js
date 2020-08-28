@@ -13,7 +13,7 @@ router.post("/", auth, function(req,res){
    CampaignCtrl.create(req,res);
 });
 router.get("/", auth, CampaignCtrl.list);
-router.get("/:id", auth, CampaignCtrl.get);
+router.get("/:id", CampaignCtrl.get);
 router.get("/sync/:id", auth, function(req,res){
   CampaignCtrl.sync(req, res);
 });
