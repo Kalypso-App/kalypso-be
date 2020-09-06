@@ -83,9 +83,9 @@ class InstagramGraphApiController {
       .update(accessToken)
       .digest("hex");
     console.log(
-      `${baseGraphApi}${instagramAccountId}/media?access_token=${accessToken}&fields=media_url&appsecret_proof=${hmac}`
+      `${baseGraphApi}${instagramAccountId}/media?access_token=${accessToken}&fields=media_url,media_type&appsecret_proof=${hmac}`
     );
-    let url = `${baseGraphApi}${instagramAccountId}/media?access_token=${accessToken}&fields=media_url&appsecret_proof=${hmac}`;
+    let url = `${baseGraphApi}${instagramAccountId}/media?access_token=${accessToken}&fields=media_url,media_type&appsecret_proof=${hmac}`;
 
     axios
       .get(url)
@@ -144,7 +144,7 @@ class InstagramGraphApiController {
   async webhook(req, res) {
     if (true || req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
      
-      var dayAgo = 72 * 60 * 60 * 1000; /* ms */
+      var dayAgo = 24 * 60 * 60 * 1000; /* ms */
       dayAgo = new Date(new Date().getTime() - dayAgo);
 
       let campaigns = await Campaign.find({
@@ -165,7 +165,7 @@ class InstagramGraphApiController {
                 if(findStory){
                   let storyInsight = new StoryInsights(findStory.value);
                   storyInsight.save();
-                  delete findStory.value.media_id;
+                  //delete findStory.value.media_id;
                   story.insights = findStory.value;   
                   needUpdate = true;               
                 }

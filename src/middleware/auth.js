@@ -24,6 +24,8 @@ const auth = async (req, res, next) => {
     if (!user) {
       throw new Error();
     }
+    // Need to check payment here as well
+    
     req.user = user;
     next();
   } catch (error) {

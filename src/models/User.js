@@ -45,6 +45,22 @@ const userSchema = mongoose.Schema({
     required: false,
   },
   //------------------- google_tokens field used for saving refresh token --------------//
+  stripeCustomerId: {
+    type: String,
+    required: false,
+  },
+  paymentMethodId:{
+    type: String,
+    required: false   
+  },
+  subscriptionId:{
+    type: String,
+    required: false      
+  },
+  paymentEndDate:{
+    type: String,
+    required: false      
+  },
   google_tokens: {
     type: Array,
     required: false,
