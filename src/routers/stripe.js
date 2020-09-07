@@ -286,7 +286,7 @@ router.post('/stripe-webhook', bodyParser.raw({ type: 'application/json' }), asy
       console.log(
         `Check the env file and enter the correct webhook secret.`
       );
-      return res.sendStatus(400);
+      return res.status(400).json(err.message);
     }
     // Extract the object from the event.
     const dataObject = event.data.object;
