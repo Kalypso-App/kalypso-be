@@ -47,7 +47,13 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(bodyParser.json({
-  limit: '50mb'
+  limit: '50mb',
+  verify: function(req,res,buf) {
+    var url = req.originalUrl;
+    if (url.startsWith('/stripe/stripe-webhook')) {
+        req.rawBody = buf.toString()
+    }
+  }
 }));
 
 //app.use(bodyParser.raw());

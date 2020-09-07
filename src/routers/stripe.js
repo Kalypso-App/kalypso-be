@@ -276,7 +276,7 @@ router.post('/stripe-webhook', bodyParser.raw({ type: 'application/json' }), asy
 
     try {
       event = stripe.webhooks.constructEvent(
-        req.body,
+        req.rawBody,
         req.headers['stripe-signature'],
         process.env.STRIPE_WEBHOOK_SECRET
       );
