@@ -22,6 +22,34 @@ router.get("/secret", async (req, res) => {
   }
 });
 
+router.get("/test", async (req, res) => {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(req.query.subscription);
+    res.status(200).json(subscription);
+  } catch (error) {
+    res.status(403).json(error);
+  }
+});
+
+router.get('/products', async (req, res) => {
+    try {
+      let products = await stripe.products.list({});
+      let prices = await stripe.prices.list({});
+
+      products.data.forEach(x=>{
+        let price = prices.data.find(y=>y.product == x.id);
+        x.price = price;
+      });
+      products.data[0].selected = true;
+
+    return res.send(products);
+  }
+  catch(error){
+    return res.status(501).json(error.message);
+  }
+  res.send([]);
+});
+
 router.post('/create-customer', async (req, res) => {
   let email = req.body.email;
   // Check user in our DB

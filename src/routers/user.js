@@ -303,6 +303,44 @@ router.get("/get-user", auth, async (req, res) => {
   return res.send(req.user);
 });
 
+router.post("/update-user", auth, async (req, res) => {
+  let email = req.body.email;
+  let user = await User.findOne({ email: email });
+  if (user) {
+    try{
+      // If facebook login, only update name
+      if(user.get('facebook_id')){
+        await User.updateOne(
+          { _id: user.get('id') },
+          {
+           name: req.body.name,
+          });
+      }
+      else{
+        // No need to update password
+        let newpass = await bcrypt.hash(req.body.password, 8); // encrypting new password to hash
+        if(req.body.password == user.get('password')){
+          newpass =  user.get('password');
+        }
+       
+        await User.updateOne(
+          { _id: user.get('id') },
+          {
+           name: req.body.name,
+           password: newpass
+          });
+      }
+
+      return res.send(req.user);
+    }
+    catch(error){
+      return res.status(501).json(error.message);
+    }
+  }
+  res.status(403).send({ error: "No user found." });  
+});
+
+
 router.get("/get-facebook-url", auth, async (req, res) => {
   const stringifiedParams = queryString.stringify({
     client_id: process.env.FB_APP_ID,
