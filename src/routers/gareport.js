@@ -42,7 +42,7 @@ router.get("/auth/googleauth/yt/:userid", async (req, res) => {
     const url = await oAuth2Client.generateAuthUrl({
       access_type: "offline",
       scope:
-        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/yt-analytics.readonly",
       state: req.params.userid + "|" + "yt", // passing user id as a state to redirect url
       prompt: "consent",
     });
@@ -206,7 +206,28 @@ router.get("/auth/get-ytchannels/:userid", async (req, res) => {
       console.log(err);
       return res.status(403).send({ message: "Error while generating token." }); // if any error while generating token, return
     }
+
+    /*
+    var youtubeAnalytics = google.youtubeAnalytics({
+      version: 'v2', auth: oAuth2Client
+   });
+
+   let dss = youtubeAnalytics.reports.query({
+      "ids": "channel==UC3_TRTLOcKaAKupEDh2Mlrg",
+      "startDate": "2020-08-01",
+      "endDate": "2020-10-31",
+      "metrics": "views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained",
+      "dimensions": "day",
+      "sort": "day"
+    }, (err, result) => {
+      if (err)
+        return {};
+        return result.data;          
+    });
+*/
     const ytchannel = google.youtube({ version: "v3" });
+
+
     ytchannel.channels.list(
       {
         // getting the channnel list

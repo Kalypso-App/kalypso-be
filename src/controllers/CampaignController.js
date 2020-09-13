@@ -5,6 +5,7 @@ const GARepository = require("../models/repositories/GARepository");
 const { formatInsightResponse } = require("../utils/instagram");
 
 const Campaign = require("../models/Campaign");
+const User = require("../models/User");
 
 class CampaignController {
 
@@ -33,20 +34,34 @@ class CampaignController {
   // Save all insights.
   async saveInsights(fbAccessToken, userid, campaignId){
     let campaign = await (await Campaign.findById(campaignId)).toObject();
+    let user = await (await (await User.findById(userid)).toObject());
+
     if(campaign){
       if(campaign.posts && campaign.posts.length){
         for(var post of campaign.posts){
           let response = await this.getIgPosts(fbAccessToken, post.id);
-          post.insights = response;
+          if(response && response.post){
+            post.insights = response.insight;
+            post.post_detail = response.post;
+            post.account_detail = user.ig_detail.profile;
+          }
         }
       }
       if(campaign.stories && campaign.stories.length){
-      
+        for(var story of campaign.stories){
+          let response = await this.getIgStories(fbAccessToken, story.id);
+          if(response && response.post){
+            story.post_detail = response.post;
+            story.account_detail = user.ig_detail.profile;
+          }
+        }
       }
       if(campaign.yt_videos && campaign.yt_videos.length){
         for(var youtube of campaign.yt_videos){
+          let acc_detail = await this.getYouTubeChannel(userid, youtube.snippet.channelId);
           let response = await this.getYoutubeStats(userid, youtube.contentDetails.videoId);
           youtube.insights = response;
+          youtube.account_detail = {...acc_detail, ...user.google_detail};
         }
       }
       if(campaign.blog_pages && campaign.blog_pages.length){
@@ -79,7 +94,8 @@ class CampaignController {
       {
         posts: campaign.posts,
         yt_videos: campaign.yt_videos,
-        blog_pages: campaign.blog_pages
+        blog_pages: campaign.blog_pages,
+        stories: campaign.stories
       }
     );
 
@@ -92,12 +108,40 @@ class CampaignController {
         id
       );
 
-      if (response.data) {
-        return formatInsightResponse(response.data.data);
+      if (response) {
+        let post = {
+          insight: response.response.data.data,
+          post: response.postDetail.data
+        }
+        return post;
       }
     }
     catch(ex){
-      return [];
+      return null;
+    }
+  }
+
+  async getIgStories(fbAccessToken, id){
+    try{
+      let response = await InstagramRepository.getInsights(
+        fbAccessToken,
+        id,
+        false
+      );
+      let post = {
+        insight: {},
+        post: {}
+        };
+      if (response) {
+       
+          if(response && response.postDetail){
+            post.post = response.postDetail.data;
+          }          
+        }
+        return post;
+    }
+    catch(ex){
+      return null;
     }
   }
 
@@ -108,6 +152,16 @@ class CampaignController {
     }
     catch(ex){
       return [];
+    }
+  }
+
+  async getYouTubeChannel(userid, channelid){
+    try{
+      let response = await GARepository.getytchannel(userid, channelid);
+      return response;
+    }
+    catch(ex){
+      return null;
     }
   }
 

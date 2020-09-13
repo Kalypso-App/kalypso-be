@@ -41,6 +41,28 @@ class GARepository {
       return [];
   };
 
+  async getytchannel(userid, channelid) {
+    const user = await User.findOne({ _id: userid }); // fetching the user data based onn id from the user model
+    if (!user) {
+      // if no user found with id then return the response
+      return {};
+    }
+    oAuth2Client.setCredentials(user.google_tokens[0]); // setting the crdentials for old tokens to oAuth
+    //oAuth2Client.refreshAccessToken((err, tokens) => {
+      
+    const ytchannel = google.youtube({ version: "v3" });
+    let response = await ytchannel.channels.list(
+      {
+        auth: oAuth2Client,
+        part: "statistics",
+        id: channelid
+      });
+      if(response && response.data.items && response.data.items.length){
+        return response.data.items[0].statistics;
+      }
+      return [];
+  };
+
   async getGAInsights(userid, viewid) {
     const user = await User.findOne({ _id: userid }); // fetching the user data based onn id from the user model
     if (!user) {

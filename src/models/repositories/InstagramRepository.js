@@ -24,7 +24,7 @@ class InstagramRepository {
     });
   }
 
-  getInsights(accessToken, mediaObjectId, isPost = true) {
+  async getInsights(accessToken, mediaObjectId, isPost = true) {
     let metric = "metric=engagement,impressions,reach,saved";
     
     if(!isPost){
@@ -36,15 +36,23 @@ class InstagramRepository {
       metric
       );
     //"metric=engagement,impressions,reach,saved"
+     
+    let urlDetail = generateInstagramGraphApiUrl(
+      accessToken,
+      `${mediaObjectId}`,
+      "fields=caption,comments_count,like_count,media_url,permalink,thumbnail_url "
+      );
+
+    let postDetail = await axios.get(urlDetail);
   
     return new Promise(function (resolve, reject) {
       axios
         .get(url)
         .then((response) => {
-          return resolve(response);
+          return resolve({response, postDetail});
         })
         .catch((e) => {
-          return reject({ message: e.response.data.error.error_user_msg});
+          return resolve({  postDetail });
         });
     });
   }
@@ -67,6 +75,7 @@ class InstagramRepository {
         });
     });
   }
+
   getRefreshToken(accessToken) {
     console.log;
     let url = generateInstagramGraphApiUrl(
@@ -120,6 +129,25 @@ class InstagramRepository {
           return resolve(response);
         })
         .catch(() => {
+          reject({ message: "Facebook token expired, please login again" });
+        });
+    });
+  }
+
+  getIgAccountDetail(accId, accessToken){
+    let url = generateInstagramGraphApiUrl(
+      accessToken,
+      `${accId}`,
+      "fields=biography,followers_count,follows_count,name,profile_picture_url,username"
+    );
+    console.log(url);
+    return new Promise(function (resolve, reject) {
+      axios
+        .get(url)
+        .then((response) => {
+          return resolve(response);
+        })
+        .catch((err) => {
           reject({ message: "Facebook token expired, please login again" });
         });
     });

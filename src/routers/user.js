@@ -450,6 +450,7 @@ router.get("/authentication/facebook", async (req, res) => {
             response[0].id,
             accessToken
           );
+          
           let instagramResponse = instagramAccounts.data;
           if (instagramResponse.data) {
             instagramResponse = instagramResponse.data;
@@ -468,6 +469,16 @@ router.get("/authentication/facebook", async (req, res) => {
           }
           //instagramAccountId = instagramResponse[0].id;
         }
+        let igAccDetail = await InstagramRepository.getIgAccountDetail(
+          instagramAccountId,
+          accessToken
+        );
+
+        businessAcc.profile = {};
+        if(igAccDetail && igAccDetail.data){
+          businessAcc.profile = igAccDetail.data;
+        }
+
         console.log("Instagram account ID: ", instagramAccountId);
         const user = await User.updateOne(
           { _id: userId },
