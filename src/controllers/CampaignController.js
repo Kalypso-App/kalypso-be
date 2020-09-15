@@ -60,7 +60,9 @@ class CampaignController {
         for(var youtube of campaign.yt_videos){
           let acc_detail = await this.getYouTubeChannel(userid, youtube.snippet.channelId);
           let response = await this.getYoutubeStats(userid, youtube.contentDetails.videoId);
+          let analytics = await this.getYouTubeAnalyticsData(userid,youtube);
           youtube.insights = response;
+          youtube.analytics = analytics;
           youtube.account_detail = {...acc_detail, ...user.google_detail};
         }
       }
@@ -165,6 +167,16 @@ class CampaignController {
     }
   }
 
+  async getYouTubeAnalyticsData(userid, video){
+    try{
+      let response = await GARepository.getYoutubeAnalytics(userid, video);
+      return response;
+    }
+    catch(ex){
+      return null;
+    }
+  }
+
   async getGoogleAnalyticsStats(userid, viewid){
     try{
       let response = await GARepository.getGAInsights(userid, viewid);
@@ -200,6 +212,19 @@ class CampaignController {
     } catch (error) {
       res.status(403).json({
         error,
+      });
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      let campaignId = req.params.id;
+      
+      await Campaign.deleteOne({_id: campaignId})
+      res.status(200).json();
+    } catch (error) {
+      res.status(403).json({
+        error
       });
     }
   }

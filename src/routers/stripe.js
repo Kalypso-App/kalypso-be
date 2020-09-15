@@ -40,6 +40,7 @@ router.get('/products', async (req, res) => {
         let price = prices.data.find(y=>y.product == x.id);
         x.price = price;
       });
+      products.data = products.data.filter(x=>x.active).sort((a,b)=>{return a.price.unit_amount - b.price.unit_amount});
       products.data[0].selected = true;
 
     return res.send(products);

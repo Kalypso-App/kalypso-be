@@ -89,7 +89,36 @@ class GARepository {
       })
 
       return response.data;
+  };
+
+  async getYoutubeAnalytics(userid, youtube) {
+    const user = await User.findOne({ _id: userid }); // fetching the user data based onn id from the user model
+    if (!user) {
+      // if no user found with id then return the response
+      return {};
+    }
+    oAuth2Client.setCredentials(user.google_tokens[0]); // setting the crdentials for old tokens to oAuth
+     
+    let channelId =  youtube.snippet.channelId;
+    let videoId =  youtube.contentDetails.videoId;
+    let startDate = youtube.contentDetails.videoPublishedAt.substring(0, 10);
+    let endDate = new Date().toISOString().substring(0, 10);
+
+    let youtubeAnalytics = await google.youtubeAnalytics({
+      version: 'v2', auth: oAuth2Client
+    }).reports.query({
+      "ids": `channel==${channelId}`,
+      "startDate": startDate,
+      "endDate": endDate,
+      "metrics": "views,comments,likes,dislikes,shares,averageViewDuration,averageViewPercentage,estimatedMinutesWatched,annotationImpressions",
+      "dimensions": "day",
+      "filters": `video==${videoId}`,
+      "sort": "day"
+    });
+
+    return youtubeAnalytics.data;
   }
+
 
 }
 

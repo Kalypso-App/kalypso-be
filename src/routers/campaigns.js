@@ -20,6 +20,7 @@ router.get("/sync/:id", auth, function(req,res){
 router.get("/search/:text", auth, function(req,res){
   CampaignCtrl.search(req,res);
 });
+router.get("/delete/:id", auth, CampaignCtrl.delete);
 
 router.post("/upload", auth, upload.single("file"), (req, res) => {
   const file = req.file;
