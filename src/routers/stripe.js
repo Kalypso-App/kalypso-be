@@ -355,14 +355,17 @@ router.post('/stripe-webhook', bodyParser.raw({ type: 'application/json' }), asy
         // If you want to manually send out invoices to your customers
         // or store them locally to reference to avoid hitting Stripe rate limits.
         break;
+        case 'customer.subscription.updated':
+          // If you want to manually send out invoices to your customers
+          // or store them locally to reference to avoid hitting Stripe rate limits.
+        break;
+        case 'customer.subscription.created':
+            // If you want to manually send out invoices to your customers
+            // or store them locally to reference to avoid hitting Stripe rate limits.
+        break;
+       
       case 'customer.subscription.deleted':
-        if (event.request != null) {
-          // handle a subscription cancelled by your request
-          // from above.
-        } else {
-          // handle subscription cancelled automatically based
-          // upon your subscription settings.
-        }
+       
         break;
       case 'customer.subscription.trial_will_end':
         // Send notification to your user that the trial will end
@@ -372,7 +375,7 @@ router.post('/stripe-webhook', bodyParser.raw({ type: 'application/json' }), asy
     }
     return res.sendStatus(200);
   }
-  return res.status(403).send({ error: "No user found." });  
+  return res.status(200).send("No user found." );  
 });
 
 module.exports = router;
