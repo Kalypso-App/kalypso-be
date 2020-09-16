@@ -12,6 +12,9 @@ let upload = multer({ storage: storage });
 router.post("/", auth, function(req,res){
    CampaignCtrl.create(req,res);
 });
+router.post("/edit-campaigns", auth, function(req,res){
+  CampaignCtrl.edit(req,res);
+});
 router.get("/", auth, CampaignCtrl.list);
 router.get("/:id", CampaignCtrl.get);
 router.get("/sync/:id", auth, function(req,res){

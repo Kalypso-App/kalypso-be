@@ -31,6 +31,34 @@ class CampaignController {
     }
   }
 
+  async edit(req, res) {
+    let campaign = req.body;
+    campaign.owner = req.user._id;
+    campaign.modified_date = new Date();
+    let accessToken;
+    try {
+      let existCampaign = await Campaign.findById(campaign._id);
+      if(existCampaign){
+        let updated = await Campaign.replaceOne({"_id": campaign._id}, campaign);
+        
+        if(req.user && req.user.fb_access_token && req.user.fb_access_token.access_token){
+          accessToken = req.user.fb_access_token.access_token;
+        }
+        await this.saveInsights(accessToken, req.user.id, campaign._id);
+        let updatedCampaign = await Campaign.findById(campaign._id);
+      
+        return res.status(200).json(updatedCampaign);
+      }
+      else{
+        res.status(501).json('Something went wrong!');
+      }
+    } catch (error) {
+      res.status(500).json({
+        error,
+      });
+    }
+  }
+
   // Save all insights.
   async saveInsights(fbAccessToken, userid, campaignId){
     let campaign = await (await Campaign.findById(campaignId)).toObject();
