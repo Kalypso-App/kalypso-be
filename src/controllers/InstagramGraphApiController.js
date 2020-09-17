@@ -105,11 +105,23 @@ class InstagramGraphApiController {
     let accessToken = req.user.fb_access_token.access_token;
 
     try {
+      let stories = [];
       let response = await InstagramRepository.getStories(
         accessToken,
         req.user.chosen_instagram_account
       );
-
+      if(response.data){
+        stories = response.data;
+      }
+      let storedStoryIds = req.user.stories;
+      
+      storedStoryIds=storedStoryIds.splice(0,25);
+      
+      let storeStories = await Story.find({ _id: storedStoryIds }).sort({modified_date: -1});
+      
+      storeStories = storeStories.filter(x=>stories.indexOf(y=>y.id == x.id) != -1);  
+      stories.push(...storeStories);
+      
       res.send(response.data);
     } catch (error) {
       res.status(403).send(error.message);
