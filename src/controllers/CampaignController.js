@@ -6,8 +6,11 @@ const { formatInsightResponse } = require("../utils/instagram");
 
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
+const Story = require("../models/Story");
 
 class CampaignController {
+
+  
 
   async create(req, res) {
     let campaign = req.body;
@@ -281,6 +284,37 @@ class CampaignController {
     res.json(updatedCampaign);
       
   }
+
+  // This cron job is for storing Instagram Story every day
+  async runCron(){
+    // Get list of users 
+    let users = await User.find({});
+    users.forEach(async (userObj)=>{
+      let user = userObj.toObject();
+      // See if User has linked Facebook account
+      if(user && user.chosen_instagram_account && user.fb_access_token && user.fb_access_token.access_token){
+        let response = await InstagramRepository.getStories(
+          user.fb_access_token.access_token,
+          user.chosen_instagram_account
+        );
+
+        if(response && response.data && response.data.length){
+          for(var story of response.data){ 
+            let isStoryAdded = await Story.find({id: story.id});
+            if(isStoryAdded.length == 0){
+              story.owner = user._id;
+              story.modified_date = new Date();
+              let newStory = await (await Story.create(story)).toObject();
+              await userObj.stories.push(newStory._id);
+            }
+          }
+          await userObj.save();
+        }
+      }
+    });
+    
+  }
+
 }
 
 module.exports = CampaignController;

@@ -62,7 +62,7 @@ class InstagramRepository {
     let url = generateInstagramGraphApiUrl(
       accessToken,
       `${instagramAccountId}/stories`,
-      "fields=media_url"
+      "fields=media_url,caption,comments_count,media_type,permalink"
     );
     return new Promise(function (resolve, reject) {
       axios
@@ -70,7 +70,7 @@ class InstagramRepository {
         .then((response) => {
           return resolve(response.data);
         })
-        .catch(() => {
+        .catch((err) => {
           reject({ message: "Facebook token expired, please login again" });
         });
     });

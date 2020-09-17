@@ -5,9 +5,16 @@ const CampaignController = require("../controllers/CampaignController");
 const CampaignCtrl = new CampaignController();
 const multer = require("multer");
 let AWS = require("aws-sdk");
+var cron = require('node-cron');
 
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
+
+cron.schedule('0 3 * * *', () => {
+    CampaignCtrl.runCron();
+}, {
+  timezone: 'America/New_York'
+});
 
 router.post("/", auth, function(req,res){
    CampaignCtrl.create(req,res);

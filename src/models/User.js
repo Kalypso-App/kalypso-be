@@ -95,17 +95,22 @@ const userSchema = mongoose.Schema({
     required: false,
     type: String,
   },
-
+  ig_detail: {
+    required: false,
+    type: Object
+  },
   campaigns: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Campaign",
     },
   ],
-  ig_detail: {
-    required: false,
-    type: Object
-  }
+  stories: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Story",
+    },
+  ]
 });
 
 userSchema.pre("save", async function (next) {

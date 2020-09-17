@@ -5,6 +5,8 @@ const InstagramRepository = require("../models/repositories/InstagramRepository"
 const StoryInsights = require("../models/StoryInsights");
 var logger = require('../config/winston');
 const Campaign = require("../models/Campaign");
+const Story = require("../models/Story");
+
 
 class InstagramGraphApiController {
   constructor() {}
@@ -150,7 +152,33 @@ class InstagramGraphApiController {
       let campaigns = await Campaign.find({
         modified_date: { $gte: dayAgo  }
       });
- 
+
+      let stories = await Story.find({
+        modified_date: { $gte: dayAgo  }
+      });
+      
+      // Loop all stories modified within last 24 hrs.
+      for(let storyDB of stories){
+        let story =  storyDB.toObject();
+        let needUpdate = false;
+            // Check webhook has story.
+            if(req.body && req.body.entry && req.body.entry.length){
+              req.body.entry.forEach(entry=>{
+                let findStory = entry.changes.find(x=>x.value && x.value.media_id == story.id);
+                if(findStory){
+                  let storyInsight = new StoryInsights(findStory.value);
+                  storyInsight.save();
+                  //delete findStory.value.media_id;
+                  storyDB.insights = findStory.value;   
+                  needUpdate = true;               
+                }
+              })
+            }
+          if(needUpdate){
+            await storyDB.save();
+          }
+      };
+
       // Loop all campaigns modified within last 24 hrs.
       campaigns.forEach((campaignDB)=>{
         let campaign =  campaignDB.toObject();
@@ -163,9 +191,6 @@ class InstagramGraphApiController {
               req.body.entry.forEach(entry=>{
                 let findStory = entry.changes.find(x=>x.value && x.value.media_id == story.id);
                 if(findStory){
-                  let storyInsight = new StoryInsights(findStory.value);
-                  storyInsight.save();
-                  //delete findStory.value.media_id;
                   story.insights = findStory.value;   
                   needUpdate = true;               
                 }

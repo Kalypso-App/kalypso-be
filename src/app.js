@@ -12,6 +12,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 var morgan = require('morgan');
 var winston = require('./config/winston');
+var cron = require('node-cron');
 
 require("./db/db");
 
@@ -64,4 +65,5 @@ app.use("/instagram", instagramRouter);
 app.use("/campaigns", campaignRouter);
 app.use("/stripe", stripeRouter);
 app.use(gaReportRouter);
+
 app.listen(port, () => {});
