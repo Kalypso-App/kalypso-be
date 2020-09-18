@@ -85,6 +85,11 @@ class CampaignController {
             story.post_detail = response.post;
             story.account_detail = user.ig_detail.profile;
           }
+          else if(story.media_url){
+            story.post_detail = {};
+            story.post_detail.media_url = story.media_url;
+            story.account_detail = user.ig_detail.profile;
+          }
         }
       }
       if(campaign.yt_videos && campaign.yt_videos.length){

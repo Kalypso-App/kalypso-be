@@ -58,7 +58,6 @@ class InstagramRepository {
   }
 
   getStories(accessToken, instagramAccountId) {
-    console.log;
     let url = generateInstagramGraphApiUrl(
       accessToken,
       `${instagramAccountId}/stories`,

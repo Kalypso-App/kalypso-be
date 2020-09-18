@@ -119,7 +119,7 @@ class InstagramGraphApiController {
       
       let storeStories = await Story.find({ _id: storedStoryIds }).sort({modified_date: -1});
       
-      storeStories = storeStories.filter(x=>stories.indexOf(y=>y.id == x.id) != -1);  
+      storeStories = storeStories.filter(x=>stories.indexOf(y=>y.id == x.id) == -1).map(x=>x.toObject());
       stories.push(...storeStories);
       
       res.send(response.data);

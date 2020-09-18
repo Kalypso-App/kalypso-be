@@ -104,19 +104,23 @@ class GARepository {
     let startDate = youtube.contentDetails.videoPublishedAt.substring(0, 10);
     let endDate = new Date().toISOString().substring(0, 10);
 
+    try{
     let youtubeAnalytics = await google.youtubeAnalytics({
       version: 'v2', auth: oAuth2Client
     }).reports.query({
       "ids": `channel==${channelId}`,
       "startDate": startDate,
       "endDate": endDate,
-      "metrics": "views,comments,likes,dislikes,shares,averageViewDuration,averageViewPercentage,estimatedMinutesWatched,annotationImpressions",
+      "metrics": "views,comments,likes,dislikes,shares,averageViewDuration,averageViewPercentage,estimatedMinutesWatched,annotationImpressions,cardClickRate",
       "dimensions": "day",
       "filters": `video==${videoId}`,
       "sort": "day"
     });
-
     return youtubeAnalytics.data;
+    }
+    catch(e){
+      return null;
+    }
   }
 
 
