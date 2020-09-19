@@ -102,7 +102,9 @@ class GARepository {
     let channelId =  youtube.snippet.channelId;
     let videoId =  youtube.contentDetails.videoId;
     let startDate = youtube.contentDetails.videoPublishedAt.substring(0, 10);
-    let endDate = new Date().toISOString().substring(0, 10);
+    let endDate = new Date();
+    endDate.setDate(endDate.getDate() + 1);
+    endDate = endDate.toISOString().substring(0, 10);
 
     try{
     let youtubeAnalytics = await google.youtubeAnalytics({
