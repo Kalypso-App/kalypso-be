@@ -73,6 +73,10 @@ const userSchema = mongoose.Schema({
     type: Object,
     required: false,
   },
+  google_ga_detail: {
+    type: Object,
+    required: false,
+  },
   tokens: [
     {
       token: {

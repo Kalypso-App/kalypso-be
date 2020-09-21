@@ -99,7 +99,7 @@ router.get("/auth/google/callback", function (req, res) {
             { 
               google_ga_tokens: tokens, 
               new: true,
-              google_detail: google_profile
+              google_ga_detail: google_profile
             }
           );
         }

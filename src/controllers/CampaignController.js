@@ -103,6 +103,29 @@ class CampaignController {
         }
       }
       if(campaign.blog_pages && campaign.blog_pages.length){
+        
+        for(var blog_page of campaign.blog_pages){
+          let response = await this.getGoogleAnalyticsStatsByTitle(userid, blog_page.viewid,campaign.due_date, blog_page.insights["ga:pageTitle"]);
+          // if (response && response.rows) {
+          //   response.rows.forEach((item, i) => {
+          //    let insights = {};
+          //    Object.keys(item).forEach((key, index) => {
+          //      if (response.columnHeaders[index]) {
+          //        insights[response.columnHeaders[index].name] =
+          //          item[index];
+          //      }
+          //    });
+          //    allInsights.push(insights);
+          //  });
+ 
+          if(response){
+            blog_page.insight_detail = response;
+            blog_page.account_detail = user.google_ga_detail;
+          }
+        }
+
+        // Old 21-09
+        /*
         let response = await this.getGoogleAnalyticsStats(userid, campaign.blog_pages[0].viewid);
         let allInsights = [];
 
@@ -125,6 +148,7 @@ class CampaignController {
             }
           }
         }
+        */
       }
     }
     return await Campaign.updateOne(
@@ -216,6 +240,16 @@ class CampaignController {
   async getGoogleAnalyticsStats(userid, viewid){
     try{
       let response = await GARepository.getGAInsights(userid, viewid);
+      return response;
+    }
+    catch(ex){
+      return [];
+    }
+  }
+
+  async getGoogleAnalyticsStatsByTitle(userid, viewid, startDate, title){
+    try{
+      let response = await GARepository.getGAInsightsByTitle(userid, viewid, startDate, title);
       return response;
     }
     catch(ex){
