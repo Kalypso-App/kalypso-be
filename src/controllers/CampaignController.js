@@ -106,6 +106,8 @@ class CampaignController {
         
         for(var blog_page of campaign.blog_pages){
           let response = await this.getGoogleAnalyticsStatsByTitle(userid, blog_page.viewid,campaign.due_date, blog_page.insights["ga:pageTitle"]);
+          let responseMonthly = await this.getGoogleAnalyticsStatsMonthly(userid, campaign.blog_pages[0].viewid);
+     
           // if (response && response.rows) {
           //   response.rows.forEach((item, i) => {
           //    let insights = {};
@@ -120,7 +122,7 @@ class CampaignController {
  
           if(response){
             blog_page.insight_detail = response;
-            blog_page.account_detail = user.google_ga_detail;
+            blog_page.account_detail = {...responseMonthly.totalsForAllResults, ...user.google_ga_detail};
           }
         }
 
@@ -240,6 +242,15 @@ class CampaignController {
   async getGoogleAnalyticsStats(userid, viewid){
     try{
       let response = await GARepository.getGAInsights(userid, viewid);
+      return response;
+    }
+    catch(ex){
+      return [];
+    }
+  }
+  async getGoogleAnalyticsStatsMonthly(userid, viewid){
+    try{
+      let response = await GARepository.getGAInsightsMonthly(userid, viewid);
       return response;
     }
     catch(ex){
