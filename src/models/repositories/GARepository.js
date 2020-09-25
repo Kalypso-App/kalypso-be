@@ -108,7 +108,7 @@ class GARepository {
         "end-date": "today",
         metrics:
           "ga:users,ga:newUsers,ga:percentNewSessions,ga:sessions,ga:bounceRate,ga:pageviews,ga:timeOnPage,ga:avgTimeOnPage,ga:organicSearches",
-        dimensions: "ga:date,ga:pageTitle",
+        dimensions: "ga:date,ga:pageTitle,ga:pagePath",
         sort: "ga:pageviews",
         "include-empty-rows": false,
         filters: `ga:pageTitle==${title}`,

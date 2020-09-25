@@ -1,6 +1,7 @@
 const campaignRepository = require("../models/repositories/CampaignRepository");
 const InstagramRepository = require("../models/repositories/InstagramRepository");
 const GARepository = require("../models/repositories/GARepository");
+const ogs = require('open-graph-scraper');
 
 const { formatInsightResponse } = require("../utils/instagram");
 
@@ -108,22 +109,31 @@ class CampaignController {
           let response = await this.getGoogleAnalyticsStatsByTitle(userid, blog_page.viewid,campaign.due_date, blog_page.insights["ga:pageTitle"]);
           let responseMonthly = await this.getGoogleAnalyticsStatsMonthly(userid, campaign.blog_pages[0].viewid);
      
-          // if (response && response.rows) {
-          //   response.rows.forEach((item, i) => {
-          //    let insights = {};
-          //    Object.keys(item).forEach((key, index) => {
-          //      if (response.columnHeaders[index]) {
-          //        insights[response.columnHeaders[index].name] =
-          //          item[index];
-          //      }
-          //    });
-          //    allInsights.push(insights);
-          //  });
- 
           if(response){
             blog_page.insight_detail = response;
             blog_page.account_detail = {...responseMonthly.totalsForAllResults, ...user.google_ga_detail};
+         
+            let index = response.columnHeaders.findIndex(x=>x.name == 'ga:pagePath');
+            if(index != -1 && response.rows && response.rows.length){
+              try{
+                const options = { url: `${blog_page.websiteUrl}${response.rows[0][index]}` };
+                let ogResult = await ogs(options);
+                if(ogResult && ogResult.result){
+                  blog_page.ogImage = ogResult.result.ogImage;
+                }
+              }
+              catch(err){
+
+              }
+            } 
           }
+            /*.then((data) => {
+              const { error, result, response } = data;
+              console.log('error:', error);  // This is returns true or false. True if there was a error. The error it self is inside the results object.
+              console.log('result:', result); // This contains all of the Open Graph results
+              console.log('response:', response); // This contains the HTML of page
+            })
+            */
         }
 
         // Old 21-09
