@@ -111,7 +111,7 @@ class GARepository {
         dimensions: "ga:date,ga:pageTitle,ga:pagePath",
         sort: "ga:pageviews",
         "include-empty-rows": false,
-        filters: `ga:pageTitle==${title}`,
+        filters: `ga:pagePath==${title}`,
         output: "json",
       }).catch(err=>{
 

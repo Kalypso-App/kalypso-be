@@ -150,7 +150,7 @@ router.get("/auth/get-views/:userid", async (req, res) => {
 //---------------- 2nd endpoint for getting the list of views ends -----------------------------//
 
 //---------------- 3rd endpoint for getting the analytics of a view starts -----------------------------//
-router.get("/auth/gareport/:userid/:viewid", async (req, res) => {
+router.get("/auth/gareport/:userid/:viewid/:search?", async (req, res) => {
   const user = await User.findOne({ _id: req.params.userid }); // fetching the user data based onn id from the user model
   if (!user) {
     // if no user found with id then return the response
@@ -164,20 +164,24 @@ router.get("/auth/gareport/:userid/:viewid", async (req, res) => {
       return res.status(403).send({ message: "Error while generating token." }); // if any error while generating token, return
     }
     const gareport = google.analytics({ version: "v3" });
+    let data = {
+      auth: oAuth2Client,
+      ids: "ga:" + req.params.viewid,
+      "start-date": "30daysAgo",
+      "end-date": "today",
+      metrics:
+        "ga:newUsers,ga:percentNewSessions,ga:sessions,ga:bounceRate,ga:pageviews",
+      dimensions: "ga:pagePath, ga:pageTitle",
+      sort: "-ga:pageviews",
+      "include-empty-rows": false,
+      output: "json",
+    };
+    if(req.params.search){
+      data.filters =  `ga:pagePath=@${req.params.search}`
+    }
+
     gareport.data.ga.get(
-      {
-        // getting the analytics of a view based on view id passed
-        auth: oAuth2Client,
-        ids: "ga:" + req.params.viewid,
-        "start-date": "30daysAgo",
-        "end-date": "today",
-        metrics:
-          "ga:newUsers,ga:percentNewSessions,ga:sessions,ga:bounceRate,ga:pageviews",
-        dimensions: "ga:pageTitle",
-        sort: "ga:pageviews",
-        "include-empty-rows": false,
-        output: "json",
-      },
+      data,
       (err, result) => {
         if (err)
           return res
