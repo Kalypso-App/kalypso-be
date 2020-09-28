@@ -87,12 +87,20 @@ class InstagramGraphApiController {
     console.log(
       `${baseGraphApi}${instagramAccountId}/media?access_token=${accessToken}&fields=media_url,media_type&appsecret_proof=${hmac}`
     );
+
     let url = `${baseGraphApi}${instagramAccountId}/media?access_token=${accessToken}&fields=media_url,media_type&appsecret_proof=${hmac}`;
+    if(req.query.before){
+      url += `&before=${req.query.before}`
+    }
+    if(req.query.after){
+      url += `&after=${req.query.after}`
+    }
+
 
     axios
       .get(url)
       .then((response) => {
-        res.send(response.data.data);
+        res.send(response.data);
       })
       .catch((e) => {
         res
