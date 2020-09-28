@@ -349,7 +349,8 @@ class CampaignController {
   async runCron(){
     // Get list of users 
     let users = await User.find({});
-    users.forEach(async (userObj)=>{
+    //users.forEach(async (userObj)=>{
+    for(var userObj of users){
       let user = userObj.toObject();
       // See if User has linked Facebook account
       if(user && user.chosen_instagram_account && user.fb_access_token && user.fb_access_token.access_token){
@@ -371,7 +372,7 @@ class CampaignController {
           await userObj.save();
         }
       }
-    });
+    };
     
   }
 
