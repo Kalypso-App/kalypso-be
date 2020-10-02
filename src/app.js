@@ -59,7 +59,7 @@ app.use(bodyParser.json({
   }
 }));
 
-app.use(require('morgan')("combined", { "stream": logger.stream }));
+//app.use(require('morgan')("combined", { "stream": logger.stream }));
 
 //app.use(bodyParser.raw());
 //app.use(express.json());
