@@ -3,7 +3,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const InstagramGraphApiController = require("../controllers/InstagramGraphApiController");
 const InstagramCtrl = new InstagramGraphApiController();
-var logger = require('../config/winston');
+var logger = require('../config/logger');
 
 router.get("/accounts", auth, InstagramCtrl.getAccounts);
 router.get("/posts", auth, InstagramCtrl.getPosts);

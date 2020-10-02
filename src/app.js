@@ -11,7 +11,9 @@ const port = process.env.PORT;
 const bodyParser = require("body-parser");
 const cors = require("cors");
 var morgan = require('morgan');
-var winston = require('./config/winston');
+//var winston = require('./config/winston');
+var logger = require("./config/logger");
+
 var cron = require('node-cron');
 
 require("./db/db");
@@ -56,6 +58,8 @@ app.use(bodyParser.json({
     }
   }
 }));
+
+app.use(require('morgan')("combined", { "stream": logger.stream }));
 
 //app.use(bodyParser.raw());
 //app.use(express.json());

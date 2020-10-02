@@ -10,7 +10,7 @@ const InstagramRepository = require("../models/repositories/InstagramRepository"
 const bcrypt = require("bcryptjs");
 const queryString = require("query-string");
 const axios = require("axios");
-var logger = require('../config/winston');
+var logger = require('../config/logger');
 
 passport.serializeUser(function (user, cb) {
   cb(null, user);
@@ -299,7 +299,7 @@ let sendToken = function (req, res) {
 };
 
 router.get("/get-user", auth, async (req, res) => {
-  
+  logger.info("get-user " + req.user._id);
   return res.send(req.user);
 });
 
@@ -353,6 +353,8 @@ router.get("/get-facebook-url", auth, async (req, res) => {
     display: "popup",
   });
   const facebookLoginUrl = `https://www.facebook.com/v6.0/dialog/oauth?${stringifiedParams}`;
+
+  logger.info("get-facebook-url " + facebookLoginUrl);
 
   res.send(facebookLoginUrl);
 });
@@ -408,10 +410,13 @@ router.get("/authentication/instagram", async (req, res) => {
 });
 
 router.get("/get-google-ga-url", auth, async (req, res) => {
+  logger.info("get-google-ga-url " + req.user._id);
   res.send(`${process.env.BACKEND_API}/auth/googleauth/ga/${req.user._id}`);
 });
 
 router.get("/get-google-yt-url", auth, async (req, res) => {
+  logger.info("get-google-yt-url " + req.user._id);
+
   res.send(`${process.env.BACKEND_API}/auth/googleauth/yt/${req.user._id}`);
 });
 

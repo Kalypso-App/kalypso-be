@@ -8,6 +8,7 @@ const { formatInsightResponse } = require("../utils/instagram");
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
 const Story = require("../models/Story");
+const logger = require("../config/logger");
 
 class CampaignController {
 
@@ -293,12 +294,15 @@ class CampaignController {
   async get(req, res) {
     try {
       let campaignId = req.params.id;
+      logger.info("campaignId " + campaignId);
       let campaign = await Campaign.findById(campaignId);
       // let campaignPosts = campaign.posts;
       // let campaignStories = campaign.stories;
       let insightsForAllCampaignPosts = {
         campaign: campaign
       };
+      logger.info("campaign detail " + insightsForAllCampaignPosts);
+
       res.status(201).json(insightsForAllCampaignPosts);
     } catch (error) {
       res.status(403).json({
