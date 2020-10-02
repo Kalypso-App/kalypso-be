@@ -38,10 +38,10 @@ module.exports = {
     // function for sending mail for forgot password
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     let text = `Hey there - we see you forgot your password for Kalypso. Don’t worry, we do this all the time, too.
-    Please reset your password at this ${process.env.APP_FRONTEND_URL}#/forget/${str} link`;
+    Please reset your password at this ${process.env.APP_FRONTEND_URL}#/reset/${str} link`;
 
     let html = `<p>Hey there - we see you forgot your password for Kalypso. Don’t worry, we do this all the time, too.</p>
-    <p>Please reset your password at this <a href="${process.env.APP_FRONTEND_URL}#/forget/${str}" target="_blank">link</a></p>`;
+    <p>Please reset your password at this <a href="${process.env.APP_FRONTEND_URL}#/reset/${str}" target="_blank">link</a></p>`;
 
 
     const msg = {
