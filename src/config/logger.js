@@ -1,5 +1,6 @@
 var appRoot = require('app-root-path');
 var winston = require('winston');
+require('winston-mongodb').MongoDB;
 
 // define the custom settings for each transport (file, console)
 var options = {
@@ -19,12 +20,14 @@ var options = {
     colorize: true,
   },
 };
-
+// new winston.transports.File(options.file)
 // instantiate a new Winston Logger with the settings defined above
 var logger = winston.createLogger({
   transports: [
-    new winston.transports.File(options.file),
-    new winston.transports.Console(options.console)
+    new(winston.transports.MongoDB)({
+      db : process.env.MONGODB_URL,
+      collection: 'logs'
+  })
   ],
   exitOnError: false, // do not exit on handled exceptions
 });
@@ -34,7 +37,7 @@ module.exports = logger;
 module.exports.stream = {
   write: function(message, encoding) {
     // use the 'info' log level so the output will be picked up by both transports (file and console)
-    logger.info(message);
+    logger.error(message);
   },
 };
 
