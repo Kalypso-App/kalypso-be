@@ -300,8 +300,7 @@ class CampaignController {
       let insightsForAllCampaignPosts = {
         campaign: campaign
       };
-      logger.info("campaign detail " + JSON.stringify(insightsForAllCampaignPosts));
-
+      
       res.status(201).json(insightsForAllCampaignPosts);
     } catch (error) {
       res.status(403).json({
