@@ -166,7 +166,6 @@ class InstagramGraphApiController {
   async webhook(req, res) {
     if (true || req.query["hub.verify_token"] == "WinterIsComingGOT2019") {
      
-      //logger.info("webhook");
       var dayAgo = 24 * 60 * 60 * 1000; /* ms */
       dayAgo = new Date(new Date().getTime() - dayAgo);
 
@@ -178,7 +177,7 @@ class InstagramGraphApiController {
         modified_date: { $gte: dayAgo  }
       });
 
-      //logger.info(JSON.stringify(req.body.entry));
+      logger.info(JSON.stringify(req.body.entry));
           
       // Loop all stories modified within last 24 hrs.
       for(let storyDB of stories){
