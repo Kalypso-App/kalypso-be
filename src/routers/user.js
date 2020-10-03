@@ -346,7 +346,7 @@ router.get("/get-facebook-url", auth, async (req, res) => {
     redirect_uri: `${process.env.BACKEND_API}/authentication/facebook`,
     state: req.user._id,
     scope:
-      "email,public_profile, instagram_basic, instagram_manage_insights, pages_show_list", // comma seperated string
+      "email,public_profile, instagram_basic, instagram_manage_insights, pages_show_list, pages_manage_metadata", // comma seperated string
     response_type: "code",
     auth_type: "rerequest",
     display: "popup",
