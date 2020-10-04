@@ -10,11 +10,19 @@ var cron = require('node-cron');
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
 
-cron.schedule('0 3 * * *', () => {
-    CampaignCtrl.runCron();
-}, {
-  timezone: 'America/New_York'
-});
+ cron.schedule('0 3 * * *', () => {
+     CampaignCtrl.runCron();
+ }, {
+   timezone: 'America/New_York'
+ });
+
+/*
+cron.schedule('* * * * *', () => {
+       CampaignCtrl.runCron();
+   }, {
+     timezone: 'America/New_York'
+   });
+*/
 
 router.post("/", auth, function(req,res){
    CampaignCtrl.create(req,res);

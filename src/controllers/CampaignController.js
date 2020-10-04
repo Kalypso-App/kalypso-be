@@ -1,7 +1,15 @@
+const request = require('request-promise')
 const campaignRepository = require("../models/repositories/CampaignRepository");
 const InstagramRepository = require("../models/repositories/InstagramRepository");
 const GARepository = require("../models/repositories/GARepository");
 const ogs = require('open-graph-scraper');
+const multer = require("multer");
+let AWS = require("aws-sdk");
+const path = require('path')
+const Url = require('url');
+
+let storage = multer.memoryStorage();
+let upload = multer({ storage: storage });
 
 const { formatInsightResponse } = require("../utils/instagram");
 
@@ -371,6 +379,7 @@ class CampaignController {
               story.modified_date = new Date();
               let newStory = await (await Story.create(story)).toObject();
               await userObj.stories.push(newStory._id);
+              await this.uploadFileToAWS(story.media_url, story.id, user._id.toString());
             }
           }
           await userObj.save();
@@ -378,6 +387,36 @@ class CampaignController {
       }
     };
     
+  }
+
+  async uploadFileToAWS(url, storyId, userId){
+    
+    const options = {
+      uri: url,
+      encoding: null
+    };
+
+    const body = await request(options);
+
+    let s3Bucket = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION,
+    });
+  
+    let params = {
+      Bucket: process.env.AWS_BUCKET_NAME + "/" + userId,
+      Key: storyId + path.extname(Url.parse(url).pathname),
+      Body: body,
+      ContentType: 'application/octet-stream',
+      ACL: "public-read"
+    };
+  
+    s3Bucket.upload(params, function (err, data) {
+      if(err){
+
+      }
+    });  
   }
 
 }
