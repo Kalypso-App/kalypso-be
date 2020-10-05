@@ -219,7 +219,30 @@ class CampaignController {
        
           if(response && response.postDetail){
             post.post = response.postDetail.data;
-          }          
+          }   
+          if(response.response && response.response.data && response.response.data.data){
+            /*
+              impressions
+              reach
+              taps_forward
+              taps_back
+              exits
+              replies
+            */
+           let insightObj = {};
+           ["impressions",
+           "reach",
+           "taps_forward",
+           "taps_back",
+           "exits",
+           "replies"].forEach(name=>{
+            let findInsight = response.response.data.data.find(x=>x.name == name);
+              if(findInsight && findInsight.values && findInsight.values.length){
+                insightObj[name] = findInsight.values[0].value;
+              }
+            });
+            post.insight = insightObj;
+          } 
         }
         return post;
     }
@@ -375,6 +398,8 @@ class CampaignController {
           for(var story of response.data){ 
             let isStoryAdded = await Story.find({id: story.id});
             if(isStoryAdded.length == 0){
+              let urlPath = story.id + path.extname(Url.parse(story.media_url).pathname);
+              story.awsMediaUrl = urlPath;
               story.owner = user._id;
               story.modified_date = new Date();
               let newStory = await (await Story.create(story)).toObject();

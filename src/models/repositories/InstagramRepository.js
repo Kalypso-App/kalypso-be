@@ -28,7 +28,7 @@ class InstagramRepository {
     let metric = "metric=engagement,impressions,reach,saved";
     
     if(!isPost){
-      metric = "metric=exits,engagement,reach,replies,taps_forward";
+      metric = "metric=exits,impressions,reach,replies,taps_forward,taps_back";
     }
     let url = generateInstagramGraphApiUrl(
       accessToken,
