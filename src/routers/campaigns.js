@@ -16,13 +16,13 @@ let upload = multer({ storage: storage });
    timezone: 'America/New_York'
  });
 
-/*
+
 cron.schedule('* * * * *', () => {
        CampaignCtrl.runCron();
    }, {
      timezone: 'America/New_York'
    });
-*/
+
 
 router.post("/", auth, function(req,res){
    CampaignCtrl.create(req,res);

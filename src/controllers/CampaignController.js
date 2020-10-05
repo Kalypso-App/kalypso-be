@@ -91,6 +91,9 @@ class CampaignController {
       if(campaign.stories && campaign.stories.length){
         for(var story of campaign.stories){
           let response = await this.getIgStories(fbAccessToken, story.id);
+          if(response && response.insight && Object.keys(response.insight).length){
+            story.insights = response.insight;
+          }
           if(response && response.post){
             story.post_detail = response.post;
             story.account_detail = user.ig_detail.profile;
