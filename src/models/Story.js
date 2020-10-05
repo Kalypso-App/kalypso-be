@@ -37,6 +37,10 @@ const storySchema = new mongoose.Schema({
   insights: {
     type: Object,
     required: false
+  },
+  awsMediaUrl:{
+    type: String,
+    required: false
   }
 });
 
