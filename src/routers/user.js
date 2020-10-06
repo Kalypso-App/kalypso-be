@@ -11,6 +11,7 @@ const bcrypt = require("bcryptjs");
 const queryString = require("query-string");
 const axios = require("axios");
 var logger = require('../config/logger');
+const TikTokScraper = require('tiktok-scraper');
 
 passport.serializeUser(function (user, cb) {
   cb(null, user);
@@ -505,6 +506,29 @@ router.get("/authentication/facebook", async (req, res) => {
   }
 
   // return data.access_token;
+});
+
+
+router.get("/tiktok/user/:name", auth, async function(req,res){
+  try{
+    const user = await User.findOne({ _id: req.user._id }); // fetching the user data based onn id from the user model
+    if (!user) {
+      res.send();
+    }
+   
+  const tiktok_user = await TikTokScraper.getUserProfileInfo(req.params.name); 
+  if(tiktok_user && tiktok_user.uniqueId){
+    await User.findOneAndUpdate(
+      { _id: req.user._id },
+      { tiktok_detail: tiktok_user },
+      { new: true }
+    );
+  }
+  res.send(tiktok_user);
+  }
+  catch(err){
+    res.send(err);
+  }
 });
 
 module.exports = router;
