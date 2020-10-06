@@ -123,12 +123,18 @@ class InstagramGraphApiController {
       }
       let storedStoryIds = req.user.stories;
       
-      storedStoryIds=storedStoryIds.splice(0,25);
+      //storedStoryIds=storedStoryIds.splice(0,25);
       
       let storeStories = await Story.find({ _id: storedStoryIds }).sort({modified_date: -1});
       storeStories =  storeStories.map(x=>x.toObject());
+      storeStories = storeStories.splice(0,25);
       storeStories = storeStories.filter(x=>stories.map(y=>y.id).indexOf(x.id.toString()));
       stories.push(...storeStories);
+      stories.forEach((story)=>{
+        if(story.awsMediaUrl){
+          story.media_url = process.env.AWS_BUCKET_NAME + "/campaigns/" + req.user._id.toString() + "/" + story.awsMediaUrl;
+        }
+      });
       
       res.send(response.data);
     } catch (error) {
