@@ -128,6 +128,18 @@ router.get("/tiktok/tiktok-scraper/:name", async function(req,res){
     res.send(err);
   }
 });
- 
+
+router.get("/tiktok/tiktok-scraper/posts/:name", async function(req,res){
+
+  try{
+  const posts = await TikTokScraper.user(req.params.name, { number: 100 });
+   
+  res.send(posts);
+  }
+  catch(err){
+    res.send(err);
+  }
+});
+
  
 module.exports = router;
