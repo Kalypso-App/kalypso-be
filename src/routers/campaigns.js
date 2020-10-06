@@ -6,6 +6,10 @@ const CampaignCtrl = new CampaignController();
 const multer = require("multer");
 let AWS = require("aws-sdk");
 var cron = require('node-cron');
+const TikTokAPI = require('tiktok-api');
+const { getRequestParams} = require('tiktok-api');
+const TikTokScraper = require('tiktok-scraper');
+
 
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
@@ -85,4 +89,45 @@ router.post("/upload", auth, upload.single("file"), (req, res) => {
   });
 });
 
+router.get("/tiktok/TikTokAPI/:name", async function(req,res){
+ 
+  const signURL = async (url, ts, deviceId) => {
+    const as = 'test_as_1234';
+    const cp = 'test_cp_12345'
+    const mas = 'test_mas_543`1';
+    return `${url}&as=${as}&cp=${cp}&mas=${mas}`;
+  };
+
+  const params = getRequestParams({
+    device_id: '83465nsakjdh72dslfkj'
+  });
+   
+  const api = new TikTokAPI.default(params, {signURL});
+   
+  let data =  await api.searchUsers({
+    keyword: req.params.name,
+    count: 10,
+    cursor: 0,
+  });
+
+
+  res.send(data.data);
+
+});
+
+
+router.get("/tiktok/tiktok-scraper/:name", async function(req,res){
+
+  try{
+  const users = await TikTokScraper.getUserProfileInfo(req.params.name);
+  const posts = await TikTokScraper.user(req.params.name, { number: 100 });
+   
+  res.send(users);
+  }
+  catch(err){
+    res.send(err);
+  }
+});
+ 
+ 
 module.exports = router;
