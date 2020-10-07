@@ -531,4 +531,20 @@ router.get("/tiktok/user/:name", auth, async function(req,res){
   }
 });
 
+router.get("/tiktok/posts", auth, async function(req,res){
+  try{
+    const user = await User.findOne({ _id: req.user._id }); // fetching the user data based onn id from the user model
+    if (!user) {
+      res.send();
+    }
+    let userObj = user.toObject();
+    const posts = await TikTokScraper.user(userObj.tiktok_detail.userId, { number: 100, by_user_id: true });
+    res.send(posts);
+  }
+  catch(err){
+    res.send(err);
+  }
+});
+
+
 module.exports = router;
