@@ -132,7 +132,7 @@ class InstagramGraphApiController {
       stories.push(...storeStories);
       stories.forEach((story)=>{
         if(story.awsMediaUrl){
-          story.media_url = process.env.AWS_UPLOADED_FILE_URL_LINK + "/campaigns/" + req.user._id.toString() + "/" + story.awsMediaUrl;
+          story.media_url = process.env.AWS_UPLOADED_FILE_URL_LINK + "campaigns/" + req.user._id.toString() + "/" + story.awsMediaUrl;
         }
       });
       
