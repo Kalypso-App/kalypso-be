@@ -309,6 +309,7 @@ router.get("/auth/get-ytvideos/:userid/:playlistid", async (req, res) => {
         auth: oAuth2Client,
         part: "snippet,contentDetails",
         playlistId: req.params.playlistid,
+        maxResults: 50
       },
       (err, result) => {
         if (err) {

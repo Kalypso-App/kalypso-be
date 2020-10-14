@@ -47,6 +47,14 @@ const campaignSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  fbposts: {
+    type: Array,
+    default: [],
+  },
+  tiktoks: {
+    type: Array,
+    default: [],
+  },
 });
 
 campaignSchema.methods.createCampaign = async (campaignData) => {

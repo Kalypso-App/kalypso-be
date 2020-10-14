@@ -76,7 +76,6 @@ class CampaignController {
   async saveInsights(fbAccessToken, userid, campaignId){
     let campaign = await (await Campaign.findById(campaignId)).toObject();
     let user = await (await (await User.findById(userid)).toObject());
-
     if(campaign){
       if(campaign.posts && campaign.posts.length){
         for(var post of campaign.posts){
@@ -139,40 +138,20 @@ class CampaignController {
               }
             } 
           }
-            /*.then((data) => {
-              const { error, result, response } = data;
-              console.log('error:', error);  // This is returns true or false. True if there was a error. The error it self is inside the results object.
-              console.log('result:', result); // This contains all of the Open Graph results
-              console.log('response:', response); // This contains the HTML of page
-            })
-            */
         }
 
-        // Old 21-09
-        /*
-        let response = await this.getGoogleAnalyticsStats(userid, campaign.blog_pages[0].viewid);
-        let allInsights = [];
-
-        if (response && response.rows) {
-           response.rows.forEach((item, i) => {
-            let insights = {};
-            Object.keys(item).forEach((key, index) => {
-              if (response.columnHeaders[index]) {
-                insights[response.columnHeaders[index].name] =
-                  item[index];
-              }
-            });
-            allInsights.push(insights);
-          });
-
-          for(var blog_page of campaign.blog_pages){
-            let insight = allInsights.find(x=>x["ga:pageTitle"] == blog_page.insights["ga:pageTitle"])
-            if(insight){
-              blog_page.insights = insight;
-            }
+      }
+      if(campaign.fbposts && campaign.fbposts.length){
+        let page_access_token = user.ig_detail.access_token;
+        for(var post of campaign.fbposts){
+          let response = await this.getFbPosts(page_access_token, fbAccessToken, post.id);
+          if(response && response.post){
+            post.insights = response.insight;
+            post.post_detail = response.post;
+            post.comment_detail = response.comment;
+            post.account_detail = user.ig_detail.fb_page_account;
           }
         }
-        */
       }
     }
     return await Campaign.updateOne(
@@ -181,7 +160,8 @@ class CampaignController {
         posts: campaign.posts,
         yt_videos: campaign.yt_videos,
         blog_pages: campaign.blog_pages,
-        stories: campaign.stories
+        stories: campaign.stories,
+        fbposts: campaign.fbposts
       }
     );
 
@@ -253,6 +233,29 @@ class CampaignController {
       return null;
     }
   }
+
+  async getFbPosts(pageAccessToken, fbAccessToken, id){
+    try{
+      let response = await InstagramRepository.getFacebookInsights(
+        pageAccessToken,
+        fbAccessToken,
+        id
+      );
+
+      if (response) {
+        let post = {
+          insight: response.response.data.data,
+          comment: response.commentDetail.data,
+          post: response.postDetail.data
+        }
+        return post;
+      }
+    }
+    catch(ex){
+      return null;
+    }
+  }
+
 
   async getYoutubeStats(userid, videoid){
     try{
@@ -377,8 +380,62 @@ class CampaignController {
     }
     await this.saveInsights(accessToken, req.user.id, campaignId);
     let updatedCampaign = await Campaign.findById(campaignId);
-    res.json(updatedCampaign);
+    res.json(updatedCampaign);   
+  }
+
+  async saveStory(req, res) {
+    let story = {};
+    story.owner = req.user._id;
+    story.modified_date = new Date();
+    story.insights = {};
+    story.id = req.user._id.toString();
+
+    story.insights.impressions = parseInt(req.body.impressions);
+    story.insights.reach = parseInt(req.body.reach);
+    story.insights.taps_back = parseInt(req.body.taps_back);
+    story.insights.taps_forward = parseInt(req.body.taps_forward);
+    story.insights.exits = parseInt(req.body.exits);
+    story.insights.replies = parseInt(req.body.replies);
+
+    let addedStory = await Story.create(story);
+    let newStory = await (addedStory).toObject();
+    
+    await req.user.stories.push(addedStory._id);
+    req.user.save();
+
+    await Story.updateOne(
+      { _id: addedStory._id },
+      {
+        media_url: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+        awsMediaUrl: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+        id: newStory._id.toString()
+      }
+    );
+
+    let s3Bucket = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION,
+    });
+  
+    
+    let params = {
+      Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString(),
+      Key: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+      ACL: "public-read"
+    };
+  
+    s3Bucket.upload(params, function (err, data) {
+      if(err){
+
+      }
+
+      res.send(data);
+    });  
       
+
   }
 
   // This cron job is for storing Instagram Story every day

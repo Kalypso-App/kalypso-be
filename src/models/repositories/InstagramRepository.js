@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { generateInstagramGraphApiUrl } = require("../../utils/instagram");
+const baseGraphApi = process.env.GRAPH_API;
 
 class InstagramRepository {
   constructor(model) {
@@ -148,6 +149,48 @@ class InstagramRepository {
         })
         .catch((err) => {
           reject({ message: "Facebook token expired, please login again" });
+        });
+    });
+  }
+
+  getFbPageDetail(pageId, accessToken){
+    let url = `${baseGraphApi}${pageId}?fields=name,cover,picture,fan_count&access_token=${accessToken}`;
+   
+    return new Promise(function (resolve, reject) {
+      axios
+        .get(url)
+        .then((response) => {
+          return resolve(response);
+        })
+        .catch((err) => {
+          reject({ message: "Facebook token expired, please login again" });
+        });
+    });
+  }
+
+  async getFacebookInsights(pageAccessToken, accessToken, post_id){
+    let fields = `post_reactions_like_total,post_reactions_love_total,post_reactions_wow_total,
+    post_reactions_haha_total,post_reactions_sorry_total,post_reactions_anger_total,
+    post_reactions_by_type_total,post_impressions,post_impressions_unique,post_engaged_users,post_clicks`;
+  
+    let url = `${baseGraphApi}${post_id}/insights?period=lifetime&metric=${fields}&access_token=${pageAccessToken}`;
+   
+    let urlDetail = `${baseGraphApi}${post_id}/comments?summary=total_count&access_token=${accessToken}`;
+
+    let urlPost = `${baseGraphApi}${post_id}?fields=id,message,story,attachments,shares&access_token=${accessToken}`;
+    
+    let postDetail = await axios.get(urlPost);
+
+    let commentDetail = await axios.get(urlDetail);
+
+    return new Promise(function (resolve, reject) {
+      axios
+        .get(url)
+        .then((response) => {
+          return resolve({response, commentDetail, postDetail});
+        })
+        .catch((err) => {
+          reject({ commentDetail, postDetail });
         });
     });
   }

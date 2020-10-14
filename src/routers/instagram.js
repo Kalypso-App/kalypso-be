@@ -8,6 +8,7 @@ var logger = require('../config/logger');
 
 router.get("/accounts", auth, InstagramCtrl.getAccounts);
 router.get("/posts", auth, InstagramCtrl.getPosts);
+router.get("/fbposts", auth, InstagramCtrl.getFacebookPosts);
 router.get("/stories", auth, InstagramCtrl.getStories);
 router.get("/webhooks",  async (req, res) => {
      // Your verify token. Should be a random string.

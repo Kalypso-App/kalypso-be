@@ -347,7 +347,7 @@ router.get("/get-facebook-url", auth, async (req, res) => {
     redirect_uri: `${process.env.BACKEND_API}/authentication/facebook`,
     state: req.user._id,
     scope:
-      "email,public_profile, instagram_basic, instagram_manage_insights, pages_show_list, pages_manage_metadata", // comma seperated string
+      "email,public_profile, instagram_basic, instagram_manage_insights, pages_show_list, pages_manage_metadata, pages_read_engagement, pages_read_user_content, read_insights", // comma seperated string
     response_type: "code",
     auth_type: "rerequest",
     display: "popup",
@@ -475,10 +475,23 @@ router.get("/authentication/facebook", async (req, res) => {
           accessToken
         );
 
+        let fbPageDetail = {};
         businessAcc.profile = {};
         if(igAccDetail && igAccDetail.data){
           businessAcc.profile = igAccDetail.data;
+         
         }
+
+        if(businessAcc && businessAcc.id && businessAcc.access_token){
+          let fbRes = await InstagramRepository.getFbPageDetail(
+            businessAcc.id,
+            businessAcc.access_token
+          );
+          if(fbRes && fbRes.data){
+            fbPageDetail = fbRes.data;
+          }
+        }
+        businessAcc.fb_page_account = fbPageDetail;
 
         console.log("Instagram account ID: ", instagramAccountId);
         const user = await User.updateOne(

@@ -264,6 +264,24 @@ class InstagramGraphApiController {
       });
   }
 
+  getFacebookPosts(req, res) {
+    let accessToken = req.user.ig_detail.access_token;
+    let pageId = req.user.ig_detail.id;
+
+    let url = `${baseGraphApi}${pageId}/posts?fields=message,attachments,story&access_token=${accessToken}`;
+    
+    axios
+      .get(url)
+      .then((response) => {
+        res.send(response.data.data);
+      })
+      .catch((e) => {
+        res
+          .status(403)
+          .send({ message: "Facebook token expired, please login again" });
+      });
+  }
+
 }
 
 module.exports = InstagramGraphApiController;
