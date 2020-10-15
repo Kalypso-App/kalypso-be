@@ -358,6 +358,23 @@ router.get("/get-facebook-url", auth, async (req, res) => {
   res.send(facebookLoginUrl);
 });
 
+router.get("/get-facebook-page-url", auth, async (req, res) => {
+  const stringifiedParams = queryString.stringify({
+    client_id: process.env.FB_APP_ID,
+    redirect_uri: `${process.env.BACKEND_API}/authentication/facebookpage`,
+    state: req.user._id,
+    scope:
+      "email,public_profile, pages_show_list, pages_manage_metadata, pages_read_engagement, pages_read_user_content, read_insights", // comma seperated string
+    response_type: "code",
+    auth_type: "rerequest",
+    display: "popup",
+  });
+  const facebookLoginUrl = `https://www.facebook.com/v6.0/dialog/oauth?${stringifiedParams}`;
+
+  
+  res.send(facebookLoginUrl);
+});
+
 
 router.get("/get-instagram-url", auth, async (req, res) => {
   const stringifiedParams = queryString.stringify({
@@ -520,6 +537,72 @@ router.get("/authentication/facebook", async (req, res) => {
 
   // return data.access_token;
 });
+
+
+router.get("/authentication/facebookpage", async (req, res) => {
+  let code = req.query.code;
+  let userId = req.query.state;
+  try {
+    const { data } = await axios({
+      url: "https://graph.facebook.com/v6.0/oauth/access_token",
+      method: "get",
+      params: {
+        client_id: process.env.FB_APP_ID,
+        client_secret: process.env.FB_APP_SECRET,
+        redirect_uri: `${process.env.BACKEND_API}/authentication/facebookpage`,
+        code,
+      },
+    });
+    //logger.info("data ");
+   
+    try {
+      // finding the user based on id and updating the token for that user
+
+      // SAVE INSTAGRAM ID
+      let accessToken = data.access_token;
+      let account_detail = null;
+      try {
+        let facebookResponse = await InstagramRepository.getAccounts(
+          accessToken
+        );
+        if(facebookResponse && facebookResponse.data && facebookResponse.data.data){
+          account_detail = facebookResponse.data.data[0];
+          
+          let existing_user = await (await User.findOne({ _id: userId })).toObject();
+          if(existing_user && existing_user.fb_detail){
+            let existingPage = facebookResponse.data.data.find(x=>x.id == existing_user.fb_detail.id);
+            if(existingPage){
+              account_detail = existingPage;
+            }
+          }
+        }
+        if (account_detail) {
+        
+        const user = await User.updateOne(
+          { _id: userId },
+          {
+            fb_detail: account_detail
+          });
+        }
+        return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
+      } catch (error) {
+        return res.status(403).json({ error: error.message });
+      }
+      if (!user) {
+        // if no user found with id then return the response
+        return res.redirect(`${process.env.APP_FRONTEND_URL}#/error`);
+      }
+      return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
+    } catch (e) {
+      return res.status(403).json({ error: e.message });
+    }
+  } catch (e) {
+    return res.status(403).json({ error: e.message });
+  }
+
+  // return data.access_token;
+});
+
 
 
 router.get("/tiktok/user/:name", auth, async function(req,res){

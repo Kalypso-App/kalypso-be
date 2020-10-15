@@ -41,6 +41,10 @@ const storySchema = new mongoose.Schema({
   awsMediaUrl:{
     type: String,
     required: false
+  },
+  isOlderStory:{
+    type: Boolean,
+    required: false
   }
 });
 

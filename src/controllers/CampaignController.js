@@ -142,7 +142,7 @@ class CampaignController {
 
       }
       if(campaign.fbposts && campaign.fbposts.length){
-        let page_access_token = user.ig_detail.access_token;
+        let page_access_token = user.fb_detail.access_token;
         for(var post of campaign.fbposts){
           let response = await this.getFbPosts(page_access_token, fbAccessToken, post.id);
           if(response && response.post){
@@ -396,6 +396,7 @@ class CampaignController {
     story.insights.taps_forward = parseInt(req.body.taps_forward);
     story.insights.exits = parseInt(req.body.exits);
     story.insights.replies = parseInt(req.body.replies);
+    story.isOlderStory = true;
 
     let addedStory = await Story.create(story);
     let newStory = await (addedStory).toObject();

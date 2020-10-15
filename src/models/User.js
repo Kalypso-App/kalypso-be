@@ -103,6 +103,10 @@ const userSchema = mongoose.Schema({
     required: false,
     type: Object
   },
+  fb_detail: {
+    required: false,
+    type: Object
+  },
   tiktok_detail: {
     required: false,
     type: Object

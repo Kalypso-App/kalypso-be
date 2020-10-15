@@ -76,6 +76,39 @@ class InstagramGraphApiController {
     }
   }
 
+  async getFacebookAccounts(req, res) {
+    if(req.user.fb_access_token){
+    let accessToken = req.user.fb_access_token.access_token;
+      try {
+        let response = await InstagramRepository.getAccounts(accessToken);
+        res.send(response.data);
+      }   catch (error) {
+        res.status(403).send(error.message);
+      }
+    }
+    else{
+      res.status(200).send([]);
+    }
+  }
+  async setFacebookAccount(req, res) {
+    let fbAccountId = req.params.id;
+    let accessToken = req.user.fb_access_token.access_token;
+    let user;
+
+    try {
+      let response = await InstagramRepository.getAccounts(accessToken);
+      if (fbAccountId && response && response.data) {
+        let selectedAcc= response.data.data.find(x=>x.id == fbAccountId);
+        req.user.fb_detail = selectedAcc;
+        user = await req.user.save();
+      }
+      res.send(user);
+    } catch (error) {
+      console.log(error);
+      res.status(403).send(error.message);
+    }
+  }
+
   getPosts(req, res) {
     let accessToken = req.user.fb_access_token.access_token;
     console.log("GETTING POSTS WITH ACCESS TOKEN: ", accessToken);
@@ -265,8 +298,8 @@ class InstagramGraphApiController {
   }
 
   getFacebookPosts(req, res) {
-    let accessToken = req.user.ig_detail.access_token;
-    let pageId = req.user.ig_detail.id;
+    let accessToken = req.user.fb_detail.access_token;
+    let pageId = req.user.fb_detail.id;
 
     let url = `${baseGraphApi}${pageId}/posts?fields=message,attachments,story&access_token=${accessToken}`;
     

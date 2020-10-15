@@ -7,6 +7,8 @@ var logger = require('../config/logger');
 
 
 router.get("/accounts", auth, InstagramCtrl.getAccounts);
+router.get("/facebook-accounts", auth, InstagramCtrl.getFacebookAccounts);
+
 router.get("/posts", auth, InstagramCtrl.getPosts);
 router.get("/fbposts", auth, InstagramCtrl.getFacebookPosts);
 router.get("/stories", auth, InstagramCtrl.getStories);
@@ -37,6 +39,7 @@ router.get("/webhooks",  async (req, res) => {
     
 router.post("/webhooks", InstagramCtrl.webhook);
 router.post("/set-account/:id", auth, InstagramCtrl.setAccount);
+router.post("/set-facebook-account/:id", auth, InstagramCtrl.setFacebookAccount);
 router.get("/igposts", auth, InstagramCtrl.getIgPosts);
 
 module.exports = router;
