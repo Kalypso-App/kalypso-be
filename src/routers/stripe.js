@@ -31,6 +31,16 @@ router.get("/test", async (req, res) => {
   }
 });
 
+router.get("/checkcoupon", async (req, res) => {
+  try {
+    const coupon = await stripe.coupons.retrieve(req.query.coupon);
+    res.status(200).json(coupon);
+  } catch (error) {
+    res.status(501).json(error.message);
+  }
+});
+
+
 router.get('/products', async (req, res) => {
     try {
       let products = await stripe.products.list({});
@@ -121,11 +131,17 @@ router.post('/create-subscription', async (req, res) => {
   }
 try{
   // Create the subscription
-  const subscription = await stripe.subscriptions.create({
+
+  let subObj = {
     customer: req.body.customerId,
     items: [{ price: req.body.priceId }],
-    expand: ['latest_invoice.payment_intent'],
-  });
+    expand: ['latest_invoice.payment_intent']
+  }
+  if(req.body.coupon){
+    subObj.coupon = req.body.coupon
+  }
+
+  const subscription = await stripe.subscriptions.create(subObj);
 
   await User.updateOne(
     { _id: user.get('id') },
