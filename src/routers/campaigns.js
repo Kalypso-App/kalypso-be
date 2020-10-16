@@ -94,6 +94,11 @@ router.post("/add-story", auth,  upload.single("oldStoryFile"), function(req,res
   CampaignCtrl.saveStory(req,res);
 });
 
+router.get("/delete-story/:id", auth,  function(req,res){
+  CampaignCtrl.deleteStory(req,res);
+});
+
+
 router.get("/tiktok/TikTokAPI/:name", async function(req,res){
  
   const signURL = async (url, ts, deviceId) => {

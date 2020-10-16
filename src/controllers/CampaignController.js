@@ -398,45 +398,79 @@ class CampaignController {
     story.insights.replies = parseInt(req.body.replies);
     story.isOlderStory = true;
 
-    let addedStory = await Story.create(story);
-    let newStory = await (addedStory).toObject();
-    
-    await req.user.stories.push(addedStory._id);
-    req.user.save();
-
-    await Story.updateOne(
-      { _id: addedStory._id },
-      {
-        media_url: newStory._id.toString() + '.' + req.body.oldStoryExtension,
-        awsMediaUrl: newStory._id.toString() + '.' + req.body.oldStoryExtension,
-        id: newStory._id.toString()
+    let Storykey = "";
+    // Edit story if Older Story id present else create new one
+    if(req.body.olderStoryId){
+      let updateObj =  {
+        insights: story.insights
+      };
+      if(req.body.oldStoryExtension && req.body.oldStoryExtension !== 'null'){
+        updateObj.media_url = req.body.olderStoryId + '.' + req.body.oldStoryExtension;
+        updateObj.awsMediaUrl = req.body.olderStoryId + '.' + req.body.oldStoryExtension;
       }
-    );
+      Storykey = req.body.olderStoryId.toString();
 
-    let s3Bucket = new AWS.S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      region: process.env.AWS_REGION,
-    });
-  
+      await Story.updateOne(
+        { _id: req.body.olderStoryId },
+        updateObj
+      );  
+    }
+    else{
+      let addedStory = await Story.create(story);
+      let newStory = await (addedStory).toObject();
+      Storykey = newStory._id.toString();
+      await req.user.stories.push(addedStory._id);
+      req.user.save();
+      await Story.updateOne(
+        { _id: addedStory._id },
+        {
+          media_url: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+          awsMediaUrl: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+          id: newStory._id.toString()
+        }
+      );  
+    }
+
+
+    if(req.file && req.file.buffer){
+      let s3Bucket = new AWS.S3({
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        region: process.env.AWS_REGION,
+      });
     
-    let params = {
-      Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString(),
-      Key: newStory._id.toString() + '.' + req.body.oldStoryExtension,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-      ACL: "public-read"
-    };
-  
-    s3Bucket.upload(params, function (err, data) {
-      if(err){
-
-      }
-
-      res.send(data);
-    });  
       
+      let params = {
+        Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString(),
+        Key: Storykey + '.' + req.body.oldStoryExtension,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+        ACL: "public-read"
+      };
+    
+      s3Bucket.upload(params, function (err, data) {
+        if(err){
 
+        }
+        res.status(200).json();
+      }); 
+    }
+    else{
+      res.status(200).json();
+    }
+  }
+
+  async deleteStory(req, res){
+    try {
+      let storyId = req.params.id;
+      
+      await Story.deleteOne({_id: storyId})
+      res.status(200).json();
+    } catch (error) {
+      res.status(403).json({
+        error
+      });
+    }
   }
 
   // This cron job is for storing Instagram Story every day
