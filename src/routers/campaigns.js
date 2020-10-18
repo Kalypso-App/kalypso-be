@@ -90,7 +90,6 @@ router.post("/upload", auth, upload.single("file"), (req, res) => {
 });
 
 router.post("/add-story", auth,  upload.single("oldStoryFile"), function(req,res){
-  let file = req.file;
   CampaignCtrl.saveStory(req,res);
 });
 

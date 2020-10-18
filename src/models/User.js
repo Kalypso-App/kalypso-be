@@ -27,6 +27,10 @@ const userSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  account_logo:{
+    type: String,
+    required: false   
+  },
   is_google: {
     type: Boolean,
   },

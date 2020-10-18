@@ -106,6 +106,9 @@ router.post('/create-subscription', async (req, res) => {
   let email = req.body.email;
   let user = await User.findOne({ email: email });
   if (user) {
+  
+    const price = await stripe.prices.retrieve(req.body.priceId);
+
 
   try {
     await stripe.paymentMethods.attach(req.body.paymentMethodId, {
@@ -136,9 +139,13 @@ try{
     customer: req.body.customerId,
     items: [{ price: req.body.priceId }],
     expand: ['latest_invoice.payment_intent']
-  }
+  };
+  
   if(req.body.coupon){
     subObj.coupon = req.body.coupon
+  }
+  if(price && price.recurring && price.recurring.trial_period_days){
+    subObj.trial_period_days = price.recurring.trial_period_days;
   }
 
   const subscription = await stripe.subscriptions.create(subObj);

@@ -12,6 +12,11 @@ const queryString = require("query-string");
 const axios = require("axios");
 var logger = require('../config/logger');
 const TikTokScraper = require('tiktok-scraper');
+let AWS = require("aws-sdk");
+const multer = require("multer");
+let storage = multer.memoryStorage();
+let upload = multer({ storage: storage });
+
 
 passport.serializeUser(function (user, cb) {
   cb(null, user);
@@ -303,18 +308,24 @@ router.get("/get-user", auth, async (req, res) => {
   return res.send(req.user);
 });
 
-router.post("/update-user", auth, async (req, res) => {
+router.post("/update-user", auth,  upload.single("accountLogo"), async (req, res) => {
   let email = req.body.email;
   let user = await User.findOne({ email: email });
   if (user) {
     try{
       // If facebook login, only update name
       if(user.get('facebook_id')){
+        let userObj = {
+          name: req.body.name,
+        };
+        if(req.file && req.file.buffer){
+          let url = process.env.AWS_UPLOADED_FILE_URL_LINK + req.user._id.toString() + "/account/";
+          url +=  req.user._id.toString() + '.' + req.body.accountLogoExtension;
+          userObj.account_logo = url;
+        }
+        //account_logo
         await User.updateOne(
-          { _id: user.get('id') },
-          {
-           name: req.body.name,
-          });
+          { _id: user.get('id') }, userObj );
       }
       else{
         // No need to update password
@@ -323,12 +334,43 @@ router.post("/update-user", auth, async (req, res) => {
           newpass =  user.get('password');
         }
        
+        let userObj = {
+          name: req.body.name,
+          password: newpass
+        };
+        if(req.file && req.file.buffer){
+          let url = process.env.AWS_UPLOADED_FILE_URL_LINK + req.user._id.toString() + "/account/";
+          url +=  req.user._id.toString() + '.' + req.body.accountLogoExtension;
+          userObj.account_logo = url;
+        }
+
         await User.updateOne(
           { _id: user.get('id') },
-          {
-           name: req.body.name,
-           password: newpass
-          });
+          userObj);
+      }
+
+      
+      if(req.file && req.file.buffer){
+        let s3Bucket = new AWS.S3({
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          region: process.env.AWS_REGION,
+        });
+      
+        
+        let params = {
+          Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString() + "/account",
+          Key: req.user._id.toString() + '.' + req.body.accountLogoExtension,
+          Body: req.file.buffer,
+          ContentType: req.file.mimetype,
+          ACL: "public-read"
+        };
+      
+        await s3Bucket.upload(params, function (err, data) {
+          if(err){
+
+          }
+        }); 
       }
 
       return res.send(req.user);
