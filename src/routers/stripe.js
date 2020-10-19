@@ -155,7 +155,9 @@ try{
     {
       paymentMethodId: req.body.paymentMethodId,
       subscriptionId: subscription.id,
-      paymentEndDate: subscription.current_period_end
+      paymentEndDate: subscription.current_period_end,
+      priceId: req.body.priceId,
+      promo_code: req.body.coupon ? req.body.coupon : ""
     }
   );
 
@@ -296,7 +298,8 @@ router.post('/update-subscription', async (req, res) => {
     { _id: user.get('id') },
     {
      subscriptionId: updatedSubscription.id,
-     paymentEndDate: updatedSubscription.current_period_end
+     paymentEndDate: updatedSubscription.current_period_end,
+     priceId: req.body.newPriceId
     }
   );
 

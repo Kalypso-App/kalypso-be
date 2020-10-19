@@ -27,6 +27,10 @@ const campaignSchema = new mongoose.Schema({
     type: Date,
     required: false,
   },
+  isProCampaign: {
+    type: Boolean,
+    required: false,
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

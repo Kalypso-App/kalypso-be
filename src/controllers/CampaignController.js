@@ -331,14 +331,12 @@ class CampaignController {
   async get(req, res) {
     try {
       let campaignId = req.params.id;
-      let campaign = await Campaign.findById(campaignId);
-      // let campaignPosts = campaign.posts;
-      // let campaignStories = campaign.stories;
-      let insightsForAllCampaignPosts = {
-        campaign: campaign
+      let campaign = await (await Campaign.findById(campaignId)).toObject();
+      if(campaign.isProCampaign){
+        let owner = await User.findById(campaign.owner.toString());
+        campaign.account_logo = owner.account_logo;
       };
-      
-      res.status(201).json(insightsForAllCampaignPosts);
+      res.status(201).json({campaign});
     } catch (error) {
       res.status(403).json({
         error,

@@ -61,6 +61,14 @@ const userSchema = mongoose.Schema({
     type: String,
     required: false      
   },
+  promo_code:{
+    type: String,
+    required: false      
+  },
+  priceId:{
+    type: String,
+    required: false      
+  },
   paymentEndDate:{
     type: String,
     required: false      
