@@ -216,7 +216,7 @@ class InstagramGraphApiController {
         modified_date: { $gte: dayAgo  }
       });
 
-      logger.info(JSON.stringify(req.body.entry));
+      //logger.info(JSON.stringify(req.body.entry));
           
       // Loop all stories modified within last 24 hrs.
       for(let storyDB of stories){

@@ -488,7 +488,7 @@ class CampaignController {
           user.chosen_instagram_account
         );
 
-        logger.info(JSON.stringify(response.data));
+        //logger.info(JSON.stringify(response.data));
       
         if(response && response.data && response.data.length){
           for(var story of response.data){ 
