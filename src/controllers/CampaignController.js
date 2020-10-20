@@ -73,7 +73,7 @@ class CampaignController {
   }
 
   // Save all insights.
-  async saveInsights(fbAccessToken, userid, campaignId){
+  async saveInsights(fbAccessToken, userid, campaignId, autoUpdate = true){
     let campaign = await (await Campaign.findById(campaignId)).toObject();
     let user = await (await (await User.findById(userid)).toObject());
     if(campaign){
@@ -153,6 +153,9 @@ class CampaignController {
           }
         }
       }
+    }
+    if(!autoUpdate){
+      return true;
     }
     return await Campaign.updateOne(
       { _id: campaignId },
@@ -536,6 +539,18 @@ class CampaignController {
       }
     });  
   }
+
+  async forcesync(req, res){
+    let campaignId = req.params.id;
+    let accessToken;
+    let userId = await (await Campaign.findById(campaignId)).toObject().owner.toString();
+    let user = await (await (await User.findById(userId)).toObject());
+    accessToken = user.fb_access_token.access_token;
+    await this.saveInsights(accessToken, userId, campaignId, false);
+    let updatedCampaign = await Campaign.findById(campaignId);
+    res.json(updatedCampaign);   
+  }
+
 
 }
 

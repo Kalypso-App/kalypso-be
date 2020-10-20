@@ -39,6 +39,9 @@ router.get("/:id", CampaignCtrl.get);
 router.get("/sync/:id", auth, function(req,res){
   CampaignCtrl.sync(req, res);
 });
+router.get("/force-sync/:id", function(req,res){
+  CampaignCtrl.forcesync(req, res);
+});
 router.get("/search/:text", auth, function(req,res){
   CampaignCtrl.search(req,res);
 });
