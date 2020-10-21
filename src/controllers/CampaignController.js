@@ -477,22 +477,22 @@ class CampaignController {
   // This cron job is for storing Instagram Story every day
   async runCron(){
     // Get list of users 
-    try{
     let users = await User.find({});
     //users.forEach(async (userObj)=>{
     for(var userObj of users){
       let user = userObj.toObject();
       // See if User has linked Facebook account
       if(user && user.chosen_instagram_account && user.fb_access_token && user.fb_access_token.access_token){
-        
-        logger.info(user._id.toString());
-
-        let response = await InstagramRepository.getStories(
-          user.fb_access_token.access_token,
-          user.chosen_instagram_account
-        );
-
-        logger.info(user._id.toString());
+        let response = null;
+        try{
+            response = await InstagramRepository.getStories(
+            user.fb_access_token.access_token,
+            user.chosen_instagram_account
+          );
+        }
+        catch(e){
+          logger.error(user._id.toString() + ' error :' + e);
+        }
         //logger.info(JSON.stringify(response.data));
       
         if(response && response.data && response.data.length){
@@ -512,10 +512,6 @@ class CampaignController {
         }
       }
     };
-    }
-    catch(e){
-      logger.info(JSON.stringify(e));
-    }
   }
 
   async uploadFileToAWS(url, storyId, userId){
