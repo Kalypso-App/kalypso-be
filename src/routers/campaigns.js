@@ -14,9 +14,10 @@ const TikTokScraper = require('tiktok-scraper');
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
 
- cron.schedule('15 6 * * *', () => {
+ cron.schedule('38 5 * * *', () => {
      CampaignCtrl.runCron();
  }, {
+   scheduled: true,
    timezone: 'America/New_York'
  });
 
