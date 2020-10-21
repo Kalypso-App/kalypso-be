@@ -491,7 +491,7 @@ class CampaignController {
           );
         }
         catch(e){
-          logger.error(user._id.toString() + ' error :' + e);
+          logger.error(user._id.toString() + ' error :' + JSON.stringify(e));
         }
         //logger.info(JSON.stringify(response.data));
       

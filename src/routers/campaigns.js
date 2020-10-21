@@ -14,7 +14,7 @@ const TikTokScraper = require('tiktok-scraper');
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
 
- cron.schedule('25 6 * * *', () => {
+ cron.schedule('20 7 * * *', () => {
      CampaignCtrl.runCron();
  }, {
    scheduled: true,
