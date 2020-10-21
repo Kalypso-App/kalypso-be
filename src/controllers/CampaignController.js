@@ -478,7 +478,6 @@ class CampaignController {
   async runCron(){
     // Get list of users 
     try{
-    logger.info("Cron job started");
     let users = await User.find({});
     //users.forEach(async (userObj)=>{
     for(var userObj of users){
@@ -490,6 +489,7 @@ class CampaignController {
           user.chosen_instagram_account
         );
 
+        logger.info(user._id.toString());
         //logger.info(JSON.stringify(response.data));
       
         if(response && response.data && response.data.length){
