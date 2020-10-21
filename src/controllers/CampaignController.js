@@ -477,6 +477,7 @@ class CampaignController {
   // This cron job is for storing Instagram Story every day
   async runCron(){
     // Get list of users 
+    try{
     let users = await User.find({});
     //users.forEach(async (userObj)=>{
     for(var userObj of users){
@@ -507,7 +508,10 @@ class CampaignController {
         }
       }
     };
-    
+    }
+    catch(e){
+      logger.info(JSON.stringify(e));
+    }
   }
 
   async uploadFileToAWS(url, storyId, userId){
