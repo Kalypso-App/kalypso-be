@@ -484,6 +484,9 @@ class CampaignController {
       let user = userObj.toObject();
       // See if User has linked Facebook account
       if(user && user.chosen_instagram_account && user.fb_access_token && user.fb_access_token.access_token){
+        
+        logger.info(user._id.toString());
+
         let response = await InstagramRepository.getStories(
           user.fb_access_token.access_token,
           user.chosen_instagram_account
