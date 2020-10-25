@@ -41,5 +41,6 @@ router.post("/webhooks", InstagramCtrl.webhook);
 router.post("/set-account/:id", auth, InstagramCtrl.setAccount);
 router.post("/set-facebook-account/:id", auth, InstagramCtrl.setFacebookAccount);
 router.get("/igposts", auth, InstagramCtrl.getIgPosts);
+router.get("/reels", auth, InstagramCtrl.getReels);
 
 module.exports = router;

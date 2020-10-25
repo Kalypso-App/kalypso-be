@@ -133,7 +133,13 @@ const userSchema = mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Story",
-    },
+    }
+  ],
+  reels:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Reel",
+    }
   ]
 });
 

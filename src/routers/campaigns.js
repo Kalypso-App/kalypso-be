@@ -102,6 +102,15 @@ router.get("/delete-story/:id", auth,  function(req,res){
 });
 
 
+router.post("/add-reel", auth,  upload.single("oldReelFile"), function(req,res){
+  CampaignCtrl.saveReel(req,res);
+});
+
+router.get("/delete-reel/:id", auth,  function(req,res){
+  CampaignCtrl.deleteReel(req,res);
+});
+
+
 router.get("/tiktok/TikTokAPI/:name", async function(req,res){
  
   const signURL = async (url, ts, deviceId) => {

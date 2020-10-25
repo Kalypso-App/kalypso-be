@@ -59,6 +59,10 @@ const campaignSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  reels: {
+    type: Array,
+    default: [],
+  },
 });
 
 campaignSchema.methods.createCampaign = async (campaignData) => {

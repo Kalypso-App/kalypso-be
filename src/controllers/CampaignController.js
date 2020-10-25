@@ -16,6 +16,8 @@ const { formatInsightResponse } = require("../utils/instagram");
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
 const Story = require("../models/Story");
+const Reel = require("../models/Reel");
+
 const logger = require("../config/logger");
 
 class CampaignController {
@@ -153,6 +155,12 @@ class CampaignController {
           }
         }
       }
+      if(campaign.reels && campaign.reels.length){
+        let acc_detail = user.ig_detail;
+        for(var reel of campaign.reels){
+          reel.account_detail = acc_detail.profile;
+        }
+      }
     }
     if(!autoUpdate){
       return true;
@@ -164,7 +172,8 @@ class CampaignController {
         yt_videos: campaign.yt_videos,
         blog_pages: campaign.blog_pages,
         stories: campaign.stories,
-        fbposts: campaign.fbposts
+        fbposts: campaign.fbposts,
+        reels: campaign.reels
       }
     );
 
@@ -474,6 +483,97 @@ class CampaignController {
     }
   }
 
+  
+  async saveReel(req, res) {
+    let reel = {};
+    reel.owner = req.user._id;
+    reel.modified_date = new Date();
+    reel.insights = {};
+    reel.id = req.user._id.toString();
+
+    reel.insights.reel_views = parseInt(req.body.reel_views);
+    reel.insights.reel_likes = parseInt(req.body.reel_likes);
+    reel.insights.reel_comments = parseInt(req.body.reel_comments);
+    if(req.user && req.user.ig_detail){
+      reel.account_detail = req.user.ig_detail.profile;
+    }
+  
+    let Reelkey = "";
+    // Edit story if Older Story id present else create new one
+    if(req.body.olderReelId){
+      let updateObj =  {
+        insights: reel.insights
+      };
+      if(req.body.oldReelExtension && req.body.oldReelExtension !== 'null'){
+        updateObj.media_url = req.body.olderReelId + '.' + req.body.oldReelExtension;
+        updateObj.awsMediaUrl = req.body.olderReelId + '.' + req.body.oldReelExtension;
+      }
+      Reelkey = req.body.olderReelId.toString();
+
+      await Reel.updateOne(
+        { _id: req.body.olderReelId },
+        updateObj
+      );  
+    }
+    else{
+      let addedReel = await Reel.create(reel);
+      let newReel = await (addedReel).toObject();
+      Reelkey = newReel._id.toString();
+      await req.user.reels.push(addedReel._id);
+      req.user.save();
+      await Reel.updateOne(
+        { _id: addedReel._id },
+        {
+          media_url: newReel._id.toString() + '.' + req.body.oldReelExtension,
+          awsMediaUrl: newReel._id.toString() + '.' + req.body.oldReelExtension,
+          id: newReel._id.toString()
+        }
+      );  
+    }
+
+
+    if(req.file && req.file.buffer){
+      let s3Bucket = new AWS.S3({
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        region: process.env.AWS_REGION,
+      });
+    
+      
+      let params = {
+        Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString() + "/reel",
+        Key: Reelkey + '.' + req.body.oldReelExtension,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+        ACL: "public-read"
+      };
+    
+      s3Bucket.upload(params, function (err, data) {
+        if(err){
+
+        }
+        res.status(200).json();
+      }); 
+    }
+    else{
+      res.status(200).json();
+    }
+  }
+
+  async deleteReel(req, res){
+    try {
+      let reelId = req.params.id;
+      
+      await Reel.deleteOne({_id: reelId})
+      res.status(200).json();
+    } catch (error) {
+      res.status(403).json({
+        error
+      });
+    }
+  }
+
+  
   // This cron job is for storing Instagram Story every day
   async runCron(){
     // Get list of users 

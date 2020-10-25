@@ -6,6 +6,7 @@ const StoryInsights = require("../models/StoryInsights");
 var logger = require('../config/logger');
 const Campaign = require("../models/Campaign");
 const Story = require("../models/Story");
+const Reel = require("../models/Reel");
 
 
 class InstagramGraphApiController {
@@ -315,6 +316,18 @@ class InstagramGraphApiController {
       });
   }
 
+  async getReels(req, res) { 
+    let ids = req.user.reels;
+    let storedReels = await Reel.find({ _id: ids }).sort({modified_date: -1});
+
+    storedReels.forEach((reel)=>{
+      if(reel.awsMediaUrl){
+        reel.media_url = process.env.AWS_UPLOADED_FILE_URL_LINK + req.user._id.toString() + "/reel/" + reel.awsMediaUrl;
+      }
+    });
+    res.send(storedReels);
+     
+  }
 }
 
 module.exports = InstagramGraphApiController;
