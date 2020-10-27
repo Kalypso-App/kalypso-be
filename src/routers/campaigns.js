@@ -110,6 +110,10 @@ router.get("/delete-reel/:id", auth,  function(req,res){
   CampaignCtrl.deleteReel(req,res);
 });
 
+router.get("/admin/get-all-campaigns",  function(req,res){
+  CampaignCtrl.getAllCampaigns(req,res);
+});
+
 
 router.get("/tiktok/TikTokAPI/:name", async function(req,res){
  

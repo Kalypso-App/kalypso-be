@@ -573,6 +573,17 @@ class CampaignController {
     }
   }
 
+  async getAllCampaigns(req, res){
+    try{
+    let campaigns = await Campaign.find().sort({modified_date: -1});
+    campaigns = campaigns.map(x=>x._id.toString());
+    return res.status(200).json(campaigns);
+    }
+    catch(err){
+      return res.status(200).json(err);
+    }
+  }
+
   
   // This cron job is for storing Instagram Story every day
   async runCron(){
