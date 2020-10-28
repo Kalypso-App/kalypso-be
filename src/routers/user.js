@@ -452,9 +452,6 @@ router.get("/authentication/instagram", async (req, res) => {
     })
   });
 
-
-  console.log(data); // { access_token, token_type, expires_in }
-       
     const user = await User.updateOne(
       { _id: userId },
       {
@@ -623,7 +620,8 @@ router.get("/authentication/facebookpage", async (req, res) => {
         const user = await User.updateOne(
           { _id: userId },
           {
-            fb_detail: account_detail
+            fb_detail: account_detail,
+            fb_access_token: data,
           });
         }
         return res.redirect(`${process.env.APP_FRONTEND_URL}#/accounts`);
