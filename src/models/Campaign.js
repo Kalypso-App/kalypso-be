@@ -39,6 +39,10 @@ const campaignSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  ga_blog_date:{
+    type: Date,
+    required: false,
+  },
   blog_pages: {
     type: Array,
     default: [],

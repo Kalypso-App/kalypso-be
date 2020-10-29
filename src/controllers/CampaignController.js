@@ -119,7 +119,11 @@ class CampaignController {
       if(campaign.blog_pages && campaign.blog_pages.length){
         
         for(var blog_page of campaign.blog_pages){
-          let response = await this.getGoogleAnalyticsStatsByTitle(userid, blog_page.viewid,campaign.due_date, blog_page.insights["ga:pagePath"]);
+          let date = campaign.due_date;
+          if(campaign.ga_blog_date){
+            date = campaign.ga_blog_date;
+          }
+          let response = await this.getGoogleAnalyticsStatsByTitle(userid, blog_page.viewid, date, blog_page.insights["ga:pagePath"]);
           let responseMonthly = await this.getGoogleAnalyticsStatsMonthly(userid, campaign.blog_pages[0].viewid);
      
           if(response){
