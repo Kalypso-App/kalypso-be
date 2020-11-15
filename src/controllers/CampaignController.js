@@ -670,6 +670,25 @@ class CampaignController {
     res.json(updatedCampaign);   
   }
 
+  async runFBTokenDebugger(){
+      // Get list of users 
+      /*
+      let users = await User.find({});
+      //users.forEach(async (userObj)=>{
+      for(var userObj of users){
+        let user = userObj.toObject();
+        // Check user is still paying
+
+        // See if User has linked Facebook account
+        if(user && user.chosen_instagram_account && user.fb_access_token && user.fb_access_token.access_token){
+          //debug_token?input_token={input-token}"
+
+
+        }
+
+      }
+      */       
+  }
 
 }
 

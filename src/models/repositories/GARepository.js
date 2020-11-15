@@ -34,6 +34,8 @@ class GARepository {
         auth: oAuth2Client,
         part: "statistics",
         id: videoid
+      }).catch(err => {
+        
       });
       if(response && response.data.items && response.data.items.length){
         return response.data.items[0].statistics;

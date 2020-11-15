@@ -21,6 +21,15 @@ let upload = multer({ storage: storage });
    timezone: 'America/New_York'
  });
 
+ 
+ cron.schedule('0 4 * * *', () => {
+  CampaignCtrl.runFBTokenDebugger();
+}, {
+scheduled: true,
+timezone: 'America/New_York'
+});
+
+
 /*
 cron.schedule('* * * * *', () => {
        CampaignCtrl.runCron();
