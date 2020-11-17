@@ -16,6 +16,9 @@ let AWS = require("aws-sdk");
 const multer = require("multer");
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
+const baseGraphApi = process.env.GRAPH_API;
+const path = require('path')
+const Url = require('url');
 
 
 passport.serializeUser(function (user, cb) {
@@ -549,6 +552,13 @@ router.get("/authentication/facebook", async (req, res) => {
         }
         businessAcc.fb_page_account = fbPageDetail;
 
+        if(businessAcc && businessAcc.profile && businessAcc.profile.profile_picture_url){
+          //let profile_url = `${baseGraphApi}${businessAcc.id}/picture?access_token=${accessToken}`;
+          await InstagramRepository.uploadProfilePictureAWS(businessAcc.profile.profile_picture_url,userId, true);
+          let profile_url_save =  process.env.AWS_UPLOADED_FILE_URL_LINK + userId + '/instagram/' + 'profile' + path.extname(Url.parse(businessAcc.profile.profile_picture_url).pathname);
+          businessAcc.profile.profile_picture_url = profile_url_save;  
+        }
+
         console.log("Instagram account ID: ", instagramAccountId);
         const user = await User.updateOne(
           { _id: userId },
@@ -616,6 +626,19 @@ router.get("/authentication/facebookpage", async (req, res) => {
           }
         }
         if (account_detail) {
+          let fbRes = await InstagramRepository.getFbPageDetail(
+            account_detail.id,
+            data.access_token
+          );
+          if(fbRes && fbRes.data){
+            Object.assign(account_detail, fbRes.data);
+          }
+          if(account_detail && account_detail.picture && account_detail.picture.data){
+            await InstagramRepository.uploadProfilePictureAWS(account_detail.picture.data.url, userId, false);
+            let profile_url_save =  process.env.AWS_UPLOADED_FILE_URL_LINK + userId + '/facebook/' + 'profile' + path.extname(Url.parse(account_detail.picture.data.url).pathname);
+            account_detail.picture.profile_picture_url = profile_url_save;  
+          }
+  
         
         const user = await User.updateOne(
           { _id: userId },

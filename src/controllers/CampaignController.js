@@ -155,7 +155,7 @@ class CampaignController {
             post.insights = response.insight;
             post.post_detail = response.post;
             post.comment_detail = response.comment;
-            post.account_detail = user.ig_detail.fb_page_account;
+            post.account_detail = user.fb_detail;
           }
         }
       }

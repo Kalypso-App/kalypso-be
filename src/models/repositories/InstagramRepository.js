@@ -1,6 +1,14 @@
 const axios = require("axios");
 const { generateInstagramGraphApiUrl } = require("../../utils/instagram");
 const baseGraphApi = process.env.GRAPH_API;
+const multer = require("multer");
+let AWS = require("aws-sdk");
+const path = require('path')
+const Url = require('url');
+const request = require('request-promise')
+
+let storage = multer.memoryStorage();
+let upload = multer({ storage: storage });
 
 class InstagramRepository {
   constructor(model) {
@@ -194,6 +202,43 @@ class InstagramRepository {
         });
     });
   }
+
+  
+  async uploadProfilePictureAWS(url, userId, isIg = true){
+    
+    const options = {
+      uri: url,
+      encoding: null
+    };
+
+    const body = await request(options);
+
+    let s3Bucket = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION,
+    });
+  
+    let key = 'instagram/' + 'profile' + path.extname(Url.parse(url).pathname);
+    if(!isIg){
+      key = 'facebook/' + 'profile' + path.extname(Url.parse(url).pathname);
+    }
+
+    let params = {
+      Bucket: process.env.AWS_BUCKET_NAME + "/" + userId,
+      Key: key,
+      Body: body,
+      ContentType: 'application/octet-stream',
+      ACL: "public-read"
+    };
+  
+    s3Bucket.upload(params, function (err, data) {
+      if(err){
+
+      }
+    });  
+  }
+
 }
 
 module.exports = new InstagramRepository();
