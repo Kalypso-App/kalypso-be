@@ -697,7 +697,7 @@ router.get("/tiktok/posts", auth, async function(req,res){
       res.send();
     }
     let userObj = user.toObject();
-    const posts = await TikTokScraper.user(userObj.tiktok_detail.userId, { number: 100, by_user_id: true });
+    const posts = await TikTokScraper.user(userObj.tiktok_detail.user.id, { number: 100, by_user_id: true });
     res.send(posts);
   }
   catch(err){
