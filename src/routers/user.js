@@ -676,7 +676,7 @@ router.get("/tiktok/user/:name", auth, async function(req,res){
     }
    
   const tiktok_user = await TikTokScraper.getUserProfileInfo(req.params.name); 
-  if(tiktok_user && tiktok_user.uniqueId){
+  if(tiktok_user && tiktok_user.user.uniqueId){
     await User.findOneAndUpdate(
       { _id: req.user._id },
       { tiktok_detail: tiktok_user },
