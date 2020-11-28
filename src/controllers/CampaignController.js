@@ -165,6 +165,12 @@ class CampaignController {
           reel.account_detail = acc_detail.profile;
         }
       }
+      if(campaign.tiktoks && campaign.tiktoks.length){
+        let acc_detail = user.tiktok_detail;
+        for(var tiktok of campaign.tiktoks){
+          tiktok.account_detail = acc_detail;
+        }
+      }
     }
     if(!autoUpdate){
       return true;
@@ -177,7 +183,8 @@ class CampaignController {
         blog_pages: campaign.blog_pages,
         stories: campaign.stories,
         fbposts: campaign.fbposts,
-        reels: campaign.reels
+        reels: campaign.reels,
+        tiktoks: campaign.tiktoks
       }
     );
 
