@@ -204,7 +204,7 @@ class InstagramRepository {
   }
 
   
-  async uploadProfilePictureAWS(url, userId, isIg = true){
+  async uploadProfilePictureAWS(url, userId, isIg = true, isTiktok = false){
     
     const options = {
       uri: url,
@@ -222,6 +222,9 @@ class InstagramRepository {
     let key = 'instagram/' + 'profile' + path.extname(Url.parse(url).pathname);
     if(!isIg){
       key = 'facebook/' + 'profile' + path.extname(Url.parse(url).pathname);
+    }
+    if(isTiktok){
+      key = 'tiktok/' + 'profile' + path.extname(Url.parse(url).pathname);
     }
 
     let params = {

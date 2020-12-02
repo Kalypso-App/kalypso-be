@@ -675,8 +675,13 @@ router.get("/tiktok/user/:name", auth, async function(req,res){
       res.send();
     }
    
-  const tiktok_user = await TikTokScraper.getUserProfileInfo(req.params.name); 
+  let tiktok_user = await TikTokScraper.getUserProfileInfo(req.params.name); 
   if(tiktok_user && tiktok_user.user.uniqueId){
+
+    await InstagramRepository.uploadProfilePictureAWS(tiktok_user.user.avatarThumb,  req.user._id.toString(), false, true);
+    let profile_url_save =  process.env.AWS_UPLOADED_FILE_URL_LINK + userId + '/tiktok/' + 'profile' + path.extname(Url.parse(account_detail.picture.data.url).pathname);
+    tiktok_user.user.avatarThumb = profile_url_save;  
+  
     await User.findOneAndUpdate(
       { _id: req.user._id },
       { tiktok_detail: tiktok_user },
