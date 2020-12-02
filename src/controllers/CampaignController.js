@@ -712,7 +712,7 @@ class CampaignController {
       if(err){
         logger.error(JSON.stringify(err));
       }
-      logger.error("Success")
+      logger.error("Success" + JSON.stringify(data))
     });  
 
   }
