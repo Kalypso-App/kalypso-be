@@ -168,16 +168,11 @@ class CampaignController {
       if(campaign.tiktoks && campaign.tiktoks.length){
         let acc_detail = user.tiktok_detail;
         for(var tiktok of campaign.tiktoks){
-          try{
           await this.saveTiktok(tiktok.covers.default, tiktok.id, userid, campaignId);
-          let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + req.user._id.toString() + '/' + campaignId + '/' + tiktok.id + path.extname(Url.parse(tiktok.covers.default).pathname);
-          logger.error(url);
+          let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + userid + '/' + campaignId + '/' + tiktok.id + path.extname(Url.parse(tiktok.covers.default).pathname);
           tiktok.awsurl = url;
           tiktok.account_detail = acc_detail;
-          }
-          catch(err){
-            logger.error(JSON.stringify(err));
-          }
+          
         }
       }
     }
