@@ -697,7 +697,7 @@ class CampaignController {
   
     let params = {
       Bucket: process.env.AWS_BUCKET_NAME + "/" + userId + '/' + campaignId,
-      Key: id + path.extname(Url.parse(url).pathname),
+      Key: id + ".jpeg",
       Body: body,
       ContentType: 'application/octet-stream',
       ACL: "public-read"
