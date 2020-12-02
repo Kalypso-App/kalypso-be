@@ -168,6 +168,9 @@ class CampaignController {
       if(campaign.tiktoks && campaign.tiktoks.length){
         let acc_detail = user.tiktok_detail;
         for(var tiktok of campaign.tiktoks){
+          await this.saveTiktok(tiktok.covers.default, tiktok.id, userid, campaignId);
+          let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + req.user._id.toString() + '/' + campaignId + '/' + tiktok.id + path.extname(Url.parse(tiktok.covers.default).pathname);
+          tiktok.awsurl = url;
           tiktok.account_detail = acc_detail;
         }
       }
@@ -675,6 +678,37 @@ class CampaignController {
     await this.saveInsights(accessToken, userId, campaignId, false);
     let updatedCampaign = await Campaign.findById(campaignId);
     res.json(updatedCampaign);   
+  }
+
+  async saveTiktok(url,id, userId, campaignId){
+     
+    const options = {
+      uri: url,
+      encoding: null
+    };
+
+    const body = await request(options);
+
+    let s3Bucket = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION,
+    });
+  
+    let params = {
+      Bucket: process.env.AWS_BUCKET_NAME + "/" + userId + '/' + campaignId,
+      Key: id + path.extname(Url.parse(url).pathname),
+      Body: body,
+      ContentType: 'application/octet-stream',
+      ACL: "public-read"
+    };
+  
+    s3Bucket.upload(params, function (err, data) {
+      if(err){
+
+      }
+    });  
+
   }
 
   async runFBTokenDebugger(){
