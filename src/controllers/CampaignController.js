@@ -682,6 +682,7 @@ class CampaignController {
   }
 
   async saveTiktok(url, id, userId, campaignId){
+    try{
     const options = {
       uri: url,
       encoding: null
@@ -707,7 +708,10 @@ class CampaignController {
         logger.error(JSON.stringify(err));
       }
     });  
-
+    }
+    catch(err){
+      
+    }
   }
 
   async runFBTokenDebugger(){
