@@ -168,9 +168,12 @@ class CampaignController {
       if(campaign.tiktoks && campaign.tiktoks.length){
         let acc_detail = user.tiktok_detail;
         for(var tiktok of campaign.tiktoks){
-          await this.saveTiktok(tiktok.covers.default, tiktok.id, userid, campaignId);
-          let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + userid + '/' + campaignId + '/' + tiktok.id + ".jpeg";
-          tiktok.awsurl = url;
+          // Only save to AWS if not saved before
+          if(!tiktok.awsurl){
+            await this.saveTiktok(tiktok.covers.default, tiktok.id, userid, campaignId);
+            let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + userid + '/' + campaignId + '/' + tiktok.id + ".jpeg";
+            tiktok.awsurl = url;
+          }
           tiktok.account_detail = acc_detail;
           
         }
@@ -710,7 +713,7 @@ class CampaignController {
     });  
     }
     catch(err){
-      
+
     }
   }
 
