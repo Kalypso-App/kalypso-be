@@ -171,6 +171,7 @@ class CampaignController {
           try{
           await this.saveTiktok(tiktok.covers.default, tiktok.id, userid, campaignId);
           let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + req.user._id.toString() + '/' + campaignId + '/' + tiktok.id + path.extname(Url.parse(tiktok.covers.default).pathname);
+          logger.error(url);
           tiktok.awsurl = url;
           tiktok.account_detail = acc_detail;
           }
@@ -686,7 +687,6 @@ class CampaignController {
   }
 
   async saveTiktok(url, id, userId, campaignId){
-    logger.error("inside saveTiktok");
     const options = {
       uri: url,
       encoding: null
@@ -707,12 +707,10 @@ class CampaignController {
       ContentType: 'application/octet-stream',
       ACL: "public-read"
     };
-    logger.error("before upload");
     s3Bucket.upload(params, function (err, data) {
       if(err){
         logger.error(JSON.stringify(err));
       }
-      logger.error("Success" + JSON.stringify(data))
     });  
 
   }
