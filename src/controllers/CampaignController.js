@@ -686,7 +686,7 @@ class CampaignController {
   }
 
   async saveTiktok(url, id, userId, campaignId){
-     
+    logger.error("inside saveTiktok");
     const options = {
       uri: url,
       encoding: null
@@ -707,11 +707,12 @@ class CampaignController {
       ContentType: 'application/octet-stream',
       ACL: "public-read"
     };
-  
+    logger.error("before upload");
     s3Bucket.upload(params, function (err, data) {
       if(err){
-
+        logger.error(JSON.stringify(err));
       }
+      logger.error("Success")
     });  
 
   }
