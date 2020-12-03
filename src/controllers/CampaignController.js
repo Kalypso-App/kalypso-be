@@ -7,6 +7,7 @@ const multer = require("multer");
 let AWS = require("aws-sdk");
 const path = require('path')
 const Url = require('url');
+const TikTokScraper = require('tiktok-scraper');
 
 let storage = multer.memoryStorage();
 let upload = multer({ storage: storage });
@@ -19,6 +20,7 @@ const Story = require("../models/Story");
 const Reel = require("../models/Reel");
 
 const logger = require("../config/logger");
+const { post } = require('../routers/user');
 
 class CampaignController {
 
@@ -174,6 +176,9 @@ class CampaignController {
             let url =  process.env.AWS_UPLOADED_FILE_URL_LINK + userid + '/' + campaignId + '/' + tiktok.id + ".jpeg";
             tiktok.awsurl = url;
           }
+          let top5_playCount = await this.getTiktokViralFactor(userid);
+          let virality_factor = top5_playCount / (acc_detail.stats.followerCount * 100);
+          tiktok.virality_factor = virality_factor;
           tiktok.account_detail = acc_detail;
           
         }
@@ -715,6 +720,18 @@ class CampaignController {
     catch(err){
 
     }
+  }
+
+  async getTiktokViralFactor(userId){
+
+    let total = 0;
+    const posts = await TikTokScraper.user(userId, { number: 5, by_user_id: true });
+    if(posts && posts.collector.length){
+      posts.collector.forEach((tiktok)=>{
+        total += tiktok.playCount;
+      });
+    }
+    return 0;
   }
 
   async runFBTokenDebugger(){
