@@ -95,7 +95,12 @@ class CampaignController {
         for(var story of campaign.stories){
           let response = await this.getIgStories(fbAccessToken, story.id);
           if(response && response.insight && Object.keys(response.insight).length){
+            let swipe_ups = 0;
+            if(story.insights){
+              swipe_ups = story.insights.swipe_ups || 0;
+            }
             story.insights = response.insight;
+            story.insights.swipe_ups = swipe_ups;
           }
           if(response && response.post){
             story.post_detail = response.post;
@@ -423,73 +428,93 @@ class CampaignController {
     story.insights = {};
     story.id = req.user._id.toString();
 
-    story.insights.impressions = parseInt(req.body.impressions);
-    story.insights.reach = parseInt(req.body.reach);
-    story.insights.taps_back = parseInt(req.body.taps_back);
-    story.insights.taps_forward = parseInt(req.body.taps_forward);
-    story.insights.exits = parseInt(req.body.exits);
-    story.insights.replies = parseInt(req.body.replies);
-    story.isOlderStory = true;
+    // This is for manully uploaded Story
+    if(req.body.isEditOlderStory == 'true'){
 
-    let Storykey = "";
-    // Edit story if Older Story id present else create new one
-    if(req.body.olderStoryId){
-      let updateObj =  {
-        insights: story.insights
-      };
-      if(req.body.oldStoryExtension && req.body.oldStoryExtension !== 'null'){
-        updateObj.media_url = req.body.olderStoryId + '.' + req.body.oldStoryExtension;
-        updateObj.awsMediaUrl = req.body.olderStoryId + '.' + req.body.oldStoryExtension;
+      story.insights.impressions = parseInt(req.body.impressions);
+      story.insights.reach = parseInt(req.body.reach);
+      story.insights.taps_back = parseInt(req.body.taps_back);
+      story.insights.taps_forward = parseInt(req.body.taps_forward);
+      story.insights.exits = parseInt(req.body.exits);
+      story.insights.replies = parseInt(req.body.replies);
+      story.insights.swipe_ups = parseInt(req.body.swipe_ups);
+      
+      story.isOlderStory = true;
+
+      let Storykey = "";
+      // Edit story if Older Story id present else create new one
+      if(req.body.olderStoryId){
+        let updateObj =  {
+          insights: story.insights
+        };
+        if(req.body.oldStoryExtension && req.body.oldStoryExtension !== 'null'){
+          updateObj.media_url = req.body.olderStoryId + '.' + req.body.oldStoryExtension;
+          updateObj.awsMediaUrl = req.body.olderStoryId + '.' + req.body.oldStoryExtension;
+        }
+        Storykey = req.body.olderStoryId.toString();
+
+        await Story.updateOne(
+          { _id: req.body.olderStoryId },
+          updateObj
+        );  
       }
-      Storykey = req.body.olderStoryId.toString();
+      else{
+        let addedStory = await Story.create(story);
+        let newStory = await (addedStory).toObject();
+        Storykey = newStory._id.toString();
+        await req.user.stories.push(addedStory._id);
+        req.user.save();
+        await Story.updateOne(
+          { _id: addedStory._id },
+          {
+            media_url: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+            awsMediaUrl: newStory._id.toString() + '.' + req.body.oldStoryExtension,
+            id: newStory._id.toString()
+          }
+        );  
+      }
 
-      await Story.updateOne(
-        { _id: req.body.olderStoryId },
-        updateObj
-      );  
+
+      if(req.file && req.file.buffer){
+        let s3Bucket = new AWS.S3({
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          region: process.env.AWS_REGION,
+        });
+      
+        
+        let params = {
+          Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString(),
+          Key: Storykey + '.' + req.body.oldStoryExtension,
+          Body: req.file.buffer,
+          ContentType: req.file.mimetype,
+          ACL: "public-read"
+        };
+      
+        s3Bucket.upload(params, function (err, data) {
+          if(err){
+
+          }
+          res.status(200).json();
+        }); 
+      }
+      else{
+        res.status(200).json();
+      }
     }
     else{
-      let addedStory = await Story.create(story);
-      let newStory = await (addedStory).toObject();
-      Storykey = newStory._id.toString();
-      await req.user.stories.push(addedStory._id);
-      req.user.save();
-      await Story.updateOne(
-        { _id: addedStory._id },
-        {
-          media_url: newStory._id.toString() + '.' + req.body.oldStoryExtension,
-          awsMediaUrl: newStory._id.toString() + '.' + req.body.oldStoryExtension,
-          id: newStory._id.toString()
-        }
-      );  
-    }
+      let st = await(await Story.findOne(
+        { id: req.body.olderStoryId })).toObject();
+        if(st){
+          let insights = st.insights || {};
+          insights.swipe_ups = parseInt(req.body.swipe_ups);
 
-
-    if(req.file && req.file.buffer){
-      let s3Bucket = new AWS.S3({
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        region: process.env.AWS_REGION,
-      });
-    
-      
-      let params = {
-        Bucket: process.env.AWS_BUCKET_NAME + "/" + req.user._id.toString(),
-        Key: Storykey + '.' + req.body.oldStoryExtension,
-        Body: req.file.buffer,
-        ContentType: req.file.mimetype,
-        ACL: "public-read"
-      };
-    
-      s3Bucket.upload(params, function (err, data) {
-        if(err){
-
+        await Story.updateOne(
+          { id: req.body.olderStoryId },
+          { insights : insights}
+        );  
         }
         res.status(200).json();
-      }); 
-    }
-    else{
-      res.status(200).json();
     }
   }
 

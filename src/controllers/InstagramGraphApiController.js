@@ -231,7 +231,12 @@ class InstagramGraphApiController {
                   let storyInsight = new StoryInsights(findStory.value);
                   storyInsight.save();
                   //delete findStory.value.media_id;
-                  storyDB.insights = findStory.value;   
+                  let swipe_ups = 0;
+                  if(story.insights){
+                    swipe_ups = story.insights.swipe_ups || 0;
+                  }
+                  storyDB.insights = findStory.value;
+                  storyDB.insights.swipe_ups = swipe_ups;
                   needUpdate = true;               
                 }
               })
@@ -253,7 +258,12 @@ class InstagramGraphApiController {
               req.body.entry.forEach(entry=>{
                 let findStory = entry.changes.find(x=>x.value && x.value.media_id == story.id);
                 if(findStory){
+                  let swipe_ups = 0;
+                  if(story.insights){
+                    swipe_ups = story.insights.swipe_ups || 0;
+                  }
                   story.insights = findStory.value;   
+                  story.insights.swipe_ups = swipe_ups;
                   needUpdate = true;               
                 }
               })
