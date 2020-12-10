@@ -45,12 +45,12 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.urlencoded({
-  limit: '50mb',
+  limit: '500mb',
   extended: true
 }));
 
 app.use(bodyParser.json({
-  limit: '50mb',
+  limit: '500mb',
   verify: function(req,res,buf) {
     var url = req.originalUrl;
     if (url.startsWith('/stripe/stripe-webhook')) {
