@@ -63,6 +63,7 @@ router.get('/products', async (req, res) => {
 
 router.post('/create-customer', async (req, res) => {
   let email = req.body.email;
+  let name = req.body.name;
   // Check user in our DB
   let user = await User.findOne({ email: email });
   if (user) {
@@ -81,7 +82,8 @@ router.post('/create-customer', async (req, res) => {
       // Create a new customer object
       try{
       const customer = await stripe.customers.create({
-        email: email
+        email: email,
+        name: name
       });
       // save the customer.id as stripeCustomerId
       // in your database.
