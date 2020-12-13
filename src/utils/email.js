@@ -60,4 +60,27 @@ module.exports = {
       throw new Error(error);
     }
   },
+
+  sendCampaignCreatedEmail: (subject, html, text) => {
+    // function for sending mail for forgot password
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+
+    const msg = {
+      to: "katherine@kalypsoapp.co",
+      from: "social@kalypsoapp.co",
+      subject: subject,
+      text: text,
+      html: html
+    };
+
+    try {
+      sgMail
+        .send(msg)
+        .then(() => {})
+        .catch(() => {});
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
 };

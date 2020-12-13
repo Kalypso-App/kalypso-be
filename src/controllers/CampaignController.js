@@ -7,6 +7,7 @@ const multer = require("multer");
 let AWS = require("aws-sdk");
 const path = require('path')
 const Url = require('url');
+const email = require("../utils/email");
 const TikTokScraper = require('tiktok-scraper');
 
 let storage = multer.memoryStorage();
@@ -40,6 +41,7 @@ class CampaignController {
       }
       await this.saveInsights(accessToken, req.user.id, newCampaign.id);
       let updatedCampaign = await Campaign.findById(newCampaign.id);
+      await this.sendEmailToAdmin(newCampaign.id);
       res.json(updatedCampaign);
     } catch (error) {
       res.status(500).json({
@@ -777,6 +779,42 @@ class CampaignController {
 
       }
       */       
+  }
+
+  async sendEmailToAdmin(campaignId){
+    let subject;
+    subject = "New Campaign Created by ";
+
+    let userId = await (await Campaign.findById(campaignId)).toObject().owner.toString();
+    let user = await (await User.findById(userId)).toObject();
+
+    let campaigns = await Campaign.find({ owner: userId }).sort({modified_date: -1});
+
+    subject += user.email + " (" + campaignId + ")";
+
+    let shareUrlPrefix = `${process.env.APP_FRONTEND_URL}#/share/`;
+    
+    let otherCampaignsHtml = "";
+    let otherCampaignsText = "";
+    campaigns.forEach(x=>{
+      otherCampaignsHtml += `<p> <a href="${shareUrlPrefix}${x._id.toString()}" target="_blank">${x._id.toString()}</a> </p>`;
+      otherCampaignsText += `${shareUrlPrefix}${x._id.toString()}`;    
+    });
+   
+
+    let html = `<p>Hi Admin</p>
+    <p>New Campaign created by ${user.name} - ${user.email} as campaign id ${campaignId} on Kalypso Web App.</p>
+    <p>You can find shared link for latest campaign <a href="${shareUrlPrefix}${campaignId}" target="_blank">here</a> .</p>
+    <p>You can also find list of all campaigns share links as below list.</p>
+    ${otherCampaignsHtml}`;
+
+    let text = `Hi Admin,
+    New Campaign created by ${user.name} - ${user.email} as campaign id ${campaignId} on Kalypso Web App.
+    You can find shared link for latest campaign ${shareUrlPrefix}${campaignId}.
+    You can also find list of all campaigns share links as below list.
+    ${otherCampaignsText}`;
+   
+    email.sendCampaignCreatedEmail(subject, html, text);
   }
 
 }
