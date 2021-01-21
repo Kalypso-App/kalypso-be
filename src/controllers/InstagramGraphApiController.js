@@ -314,10 +314,17 @@ class InstagramGraphApiController {
 
     let url = `${baseGraphApi}${pageId}/posts?fields=message,attachments,story&access_token=${accessToken}`;
     
+    if(req.query.before){
+      url += `&before=${req.query.before}`
+    }
+    if(req.query.after){
+      url += `&after=${req.query.after}`
+    }
+
     axios
       .get(url)
       .then((response) => {
-        res.send(response.data.data);
+        res.send(response.data);
       })
       .catch((e) => {
         res
